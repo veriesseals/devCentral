@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social.apps.SocialConfig',  # use the AppConfig so signals run
+    'social.apps.SocialConfig',
 ]
 
 MIDDLEWARE = [
