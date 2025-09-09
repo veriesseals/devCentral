@@ -13,6 +13,9 @@ from .models import Post, Reaction, Share, Profile
 # Create your views here.
 # -----------------------------------------------
 
+
+# Created signup_view
+# -----------------------------------------------
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST, request.FILES)
@@ -32,7 +35,14 @@ def signup_view(request):
         form = SignUpForm()
     return render(request, 'auth/signup.html', {'form': form})
 
-
+# Created feed_view
+# -----------------------------------------------
 @login_required
 def feed_view(request):
-    pass
+    # Get posts from users the current user is following or their own posts
+    following_ids = request.user.profile.following.values_list('id', flat = True)
+    posts = Post.objects.filter(Q(author=request.user) | Q(author__id__in=following_ids)).order_by('-created_at')
+    post_form = PostForm()
+    reply_form = ReplyForm()
+    return render(request, 'feed.html', {'posts': posts, 'post_form': post_form, 'reply_form': reply_form})
+
