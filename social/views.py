@@ -14,4 +14,25 @@ from .models import Post, Reaction, Share, Profile
 # -----------------------------------------------
 
 def signup_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            # Create a Profile instance for the new user
+            user = form.save()
+            profile = user.profile
+            profile.bio = form.cleaned_data.get('bio', '')
+            avatar = form.cleaned_data.get('avatar')
+            if avatar:
+                profile.avatar = avatar
+            profile.save()
+            login(request, user)
+            return redirect('feed')
+    else:
+        form = SignUpForm()
+    return render(request, 'auth/signup.html', {'form': form})
+
+
+@login_required
+def feed_view(request):
     pass
