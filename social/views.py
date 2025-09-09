@@ -46,3 +46,16 @@ def feed_view(request):
     reply_form = ReplyForm()
     return render(request, 'feed.html', {'posts': posts, 'post_form': post_form, 'reply_form': reply_form})
 
+# Created create_post
+# -----------------------------------------------
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            obj = form.save(commit = False)
+            obj.author = request.user
+            obj.save()
+    return redirect('feed')
+
+@login_required
