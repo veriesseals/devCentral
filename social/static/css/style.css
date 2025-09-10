@@ -85,6 +85,41 @@ body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+/* Follow button */
+.btn-follow {
+  background: var(--teal);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+}
+.btn-follow:hover {
+  background: var(--teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Unfollow button */
+.btn-unfollow {
+  background: #e11d48; /* red */
+  color: white;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+}
+.btn-unfollow:hover {
+  background: #be123c; /* darker red */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+
 
 
 .compose-card,

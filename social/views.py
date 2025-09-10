@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -100,3 +101,23 @@ def profile_view(request, username):
         form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid(): form.save(); return redirect('profile', username=u.username)
     return render(request, 'profile.html', {'profile_user': u, 'is_following': is_following, 'posts': posts, 'form': form})
+
+# follow/unfollow shortcuts
+# -----------------------------------------------
+@login_required
+def follow(request, username):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    target = get_object_or_404(User, username=username)
+    if target != request.user:
+        target.profile.followers.add(request.user)
+    return redirect('profile', username=username)
+
+@login_required
+def unfollow(request, username):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    target = get_object_or_404(User, username=username)
+    if target != request.user:
+        target.profile.followers.remove(request.user)
+    return redirect('profile', username=username)

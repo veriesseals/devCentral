@@ -12,4 +12,6 @@ urlpatterns = [
     path('post/<int:post_id>/share/', views.share_post, name='post-share'),
     path('u/<str:username>/', views.profile_view, name='profile'),
     path('u/<str:username>/follow/', views.toggle_follow, name='follow-toggle'),
+    path('u/<str:username>/follow/', views.follow, name='follow'),
+    path('u/<str:username>/unfollow/', views.unfollow, name='unfollow'),
 ]

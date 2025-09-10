@@ -3,30 +3,54 @@
 <div class="profile">
     <div class="avatar lg">
         {% if profile_user.profile.avatar %}
-            <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
+        <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
         {% else %}
-            <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+        <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
         {% endif %}
     </div>
-    </div>
-    <h2>@{{ profile_user.username }}</h2>
-    <p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
-    <p>{{ profile_user.profile.bio }}</p>
+</div>
+<h2>@{{ profile_user.username }}</h2>
+<p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
+<p>{{ profile_user.profile.bio }}</p>
 
-    {% if user != profile_user %}
-    <a class="btn" href="{% url 'follow-toggle' profile_user.username %}">
-        {% if is_following %}Unfollow{% else %}Follow{% endif %}
-    </a>
-    {% else %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %} {{ form.as_p }}
-        <button class="btn" type="submit">Update Profile</button>
-    </form>
-    {% endif %}
-    </div>
+<!-- Follow/Unfollow button -->
+{% if user != profile_user %}
+<a class="btn" href="{% url 'follow-toggle' profile_user.username %}">
+    {% if is_following %}Unfollow{% else %}Follow{% endif %}
+</a>
+{% else %}
 
-    <hr><h3>Posts</h3>
-    {% for post in posts %}
-    <p>{{ post.body }} <em>{{ post.created_at|date:"M d, Y H:i" }}</em></p>
+<!-- New Follow/Unfollow buttons -->
+{% if user != profile_user %}
+{% if user in profile_user.profile.followers.all %}
+<!-- Already following -->
+<form action="{% url 'unfollow' profile_user.username %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn-unfollow">Unfollow</button>
+</form>
+{% else %}
+<!-- Not following yet -->
+<form action="{% url 'follow' profile_user.username %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn-follow">Follow</button>
+</form>
+{% endif %}
+{% endif %}
+
+
+
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %} {{ form.as_p }}
+    <button class="btn" type="submit">Update Profile</button>
+</form>
+{% endif %}
+
+</div>
+
+<hr>
+<h3>Posts</h3>
+{% for post in posts %}
+<p>{{ post.body }} <em>{{ post.created_at|date:"M d, Y H:i" }}</em></p>
 {% empty %}<p>No posts yet.</p>{% endfor %}
 {% endblock %}

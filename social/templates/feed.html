@@ -15,9 +15,9 @@
 <article class="post-card">
   <div class="avatar">
     {% if post.author.profile.avatar %}
-      <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
+    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
     {% else %}
-      <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+    <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
     {% endif %}
   </div>
   <div class="content">
@@ -25,26 +25,48 @@
       <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
       <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
       <a class="follow" href="{% url 'follow-toggle' post.author.username %}">Follow/Unfollow</a>
+
+      <!-- New Follow/UnFollow Buttons -->
+      <div class="meta">
+  <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
+
+  {% if user.is_authenticated and user != post.author %}
+    {% if user in post.author.profile.followers.all %}
+      <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-unfollow">Unfollow</button>
+      </form>
+    {% else %}
+      <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-follow">Follow</button>
+      </form>
+    {% endif %}
+  {% endif %}
+</div>
+
+      <!-- End New Follow buttons -->
+
     </div>
     <p>{{ post.body }}</p>
     {% if post.image %}<img class="post-image" src="{{ post.image.url }}" alt="post image">{% endif %}
     <div class="actions">
-        <a href="{% url 'post-react' post.id 'like' %}">👍 {{ post.likes_count }}</a>
-        <a href="{% url 'post-react' post.id 'dislike' %}">👎 {{ post.dislikes_count }}</a>
-        <a href="{% url 'post-share' post.id %}">🔁 {{ post.shares_count }}</a>
+      <a href="{% url 'post-react' post.id 'like' %}">👍 {{ post.likes_count }}</a>
+      <a href="{% url 'post-react' post.id 'dislike' %}">👎 {{ post.dislikes_count }}</a>
+      <a href="{% url 'post-share' post.id %}">🔁 {{ post.shares_count }}</a>
     </div>
     <details class="replies">
-        <summary>Replies ({{ post.replies.count }})</summary>
-        <ul>
+      <summary>Replies ({{ post.replies.count }})</summary>
+      <ul>
         {% for r in post.replies.all %}
-            <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
+        <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
         {% empty %}<li>No replies yet.</li>{% endfor %}
-        </ul>
-        <form action="{% url 'post-reply' post.id %}" method="post">
+      </ul>
+      <form action="{% url 'post-reply' post.id %}" method="post">
         {% csrf_token %} {{ reply_form.body }} <button class="btn" type="submit">Reply</button>
-        </form>
+      </form>
     </details>
-    </div>
+  </div>
 </article>
 {% empty %}<p>No posts yet. Say hi! 👋</p>{% endfor %}
 {% endblock %}
