@@ -25,7 +25,7 @@
             </div>
             <nav>
                 {% if user.is_authenticated %}
-                <a href="{% url 'feed' %}">Home</a>
+                <a href="{% url 'feed' %}">My Post</a>
                 <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
 
                 {% if user.is_authenticated %}
@@ -148,8 +148,8 @@
     <footer class="dc-footer">
         <div class="wrap">
             <span>Tru devCentral &copy; • Copyright 2025</span>
-            <span>• Developed by: Veries Seals III • Updated: {% now "d-m-Y H:i:s" as current_time %}{{ current_time
-                }}</span>
+            <span>• Developed by: Veries Seals III • Updated: {{ current_time|date:"M d, Y H:i:s" }}
+            </span>
 
         </div>
     </footer>
