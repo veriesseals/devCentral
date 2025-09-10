@@ -33,12 +33,13 @@
                 </form>
 
                 {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                <a class="btn" href="{% url 'signup' %}">Sign up</a>
+                <button type="submit" class="btn">Log in</button>
+                <a href="{% url 'signup' %}" class="btn">Sign up</a>
+
                 {% endif %}
 
                 {% else %}
-                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'login' %}" class="btn">Login</a>
                 <a class="btn brand" href="{% url 'signup' %}">Sign up</a>
 
                 {% endif %}

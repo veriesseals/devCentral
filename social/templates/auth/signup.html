@@ -7,7 +7,7 @@
   <h2>Create your DevCentral account</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %} {{ form.as_p }}
-    <button class="btn" type="submit">Sign up</button>
+    <a href="{% url 'signup' %}" class="btn">Sign up</a>
   </form>
 </div>
 {% endblock %}

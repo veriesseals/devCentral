@@ -1,5 +1,11 @@
 :root{
-  --teal:#10b4b4;--teal-dark:#0b8d8d;--bg:#fff;--text:#0f172a;--muted:#6b7280;--card:#f6ffff
+  --teal:#10b4b4;
+  --teal-dark:#0b8d8d;
+  --bg:#fff;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --card:#f6ffff
+  
 }
 
 * {
@@ -41,18 +47,45 @@ body {
   margin-left:16px;
   text-decoration:none
 }
+:root {
+  --teal: #14b8a6;
+  --teal-dark: #0d9488;
+}
+
+/* Shared button style */
+:root {
+  --teal: #14b8a6;
+  --teal-dark: #0d9488;
+}
+
+/* Shared button style */
 .btn {
-  background:#fff;
-  color:var(--teal-dark);
-  padding:8px 14px;
-  border-radius:999px;
-  border:0;
-  cursor:pointer;
-  font-weight:600
+  background: var(--teal);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
 }
+
+/* Hover/rollover */
 .btn:hover {
-  background:#e8ffff
+  background: var(--teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
+
+/* Active/click */
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
 
 .compose-card,
 .post-card {
@@ -169,22 +202,11 @@ textarea {
 }
 
 /* Default button */
-.btn {
-  background: var(--teal);
-  color: white;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 0;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
+:root {
+  --teal: #14b8a6;
+  --teal-dark: #0d9488;
 }
 
-.btn:hover {
-  background: var(--teal-dark);
-  color: white;
-}
 
 .inline-logout {
   display: inline;
