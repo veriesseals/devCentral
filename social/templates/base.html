@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevCentral</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head><body>
+<header class="dc-header"><div class="wrap">
+    <div class="brand">
+    <!-- LOGO SLOT (header): replace this source with your real logo -->
+    <img src="{% static 'img/devcentral-logo-placeholder.svg' %}" class="logo" alt="DevCentral">
+    <h1>DevCentral</h1>
+    </div>
+    <nav>
+    {% if user.is_authenticated %}
+        <a href="{% url 'feed' %}">Home</a>
+        <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a class="btn" href="{% url 'signup' %}">Sign up</a>
+    {% endif %}
+    </nav>
+</div></header>
+
+<main class="wrap">{% block content %}{% endblock %}</main>
+
+<footer class="dc-footer"><div class="wrap">
+    <span>devCentral: Copyright 2025.</span>
+    <span>Developed by: Veries Seals III • Updated: {% now "Y-m-d H:i:s" %}</span>
+</div></footer>
+</body></html>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}{% load static %}
+{% block content %}
+<div class="profile">
+    <div class="avatar lg">
+        {% if profile_user.profile.avatar %}
+            <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
+        {% else %}
+            <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+        {% endif %}
+    </div>
+    </div>
+    <h2>@{{ profile_user.username }}</h2>
+    <p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
+    <p>{{ profile_user.profile.bio }}</p>
+
+    {% if user != profile_user %}
+    <a class="btn" href="{% url 'follow-toggle' profile_user.username %}">
+        {% if is_following %}Unfollow{% else %}Follow{% endif %}
+    </a>
+    {% else %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %} {{ form.as_p }}
+        <button class="btn" type="submit">Update Profile</button>
+    </form>
+    {% endif %}
+    </div>
+
+    <hr><h3>Posts</h3>
+    {% for post in posts %}
+    <p>{{ post.body }} <em>{{ post.created_at|date:"M d, Y H:i" }}</em></p>
+{% empty %}<p>No posts yet.</p>{% endfor %}
+{% endblock %}
