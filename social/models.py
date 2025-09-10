@@ -12,7 +12,15 @@ def avatar_upload_path(instance, filename):
     return f'avatars/{instance.user_id}/{filename}'
 
 def post_upload_path(instance, filename):
-    return f'posts/{instance.user_id}/{filename}'
+    # Use the Post.author FK, not user
+    author_id = getattr(instance, 'author_id', None)
+    if not author_id and getattr(instance, 'author', None):
+        try:
+            author_id = instance.author.pk
+        except Exception:
+            author_id = 'tmp'
+    return f'posts/{author_id or "tmp"}/{filename}'
+
 
 # Profile model
 # -----------------------------------------------
