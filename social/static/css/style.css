@@ -307,3 +307,50 @@ textarea {
   display: inline-block;
   font-weight: 700;
 }
+
+/* Code Block Styles */
+.post-card pre code,
+.snippet-card pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+.post-card pre,
+.snippet-card pre {
+  border-radius: 10px;
+  overflow: auto;
+  margin: 8px 0;
+}
+
+/* Style Code Blocks */
+.post-card pre code,
+.snippet-card pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+.post-card pre,
+.snippet-card pre {
+  border-radius: 10px;
+  overflow: auto;
+  margin: 8px 0;
+}
+
+/* CSS for Pygments */
+/* Minimal Pygments defaults */
+.codehilite {
+   background: #0f172a; 
+   color: #e5e7eb; 
+   padding: 10px; 
+   border-radius: 10px; 
+   overflow:auto; 
+}
+.codehilite .k {
+   color: #93c5fd; 
+}   /* keywords */
+.codehilite .s {
+   color: #fca5a5; 
+}   /* strings  */
+.codehilite .c {
+   color: #9ca3af; 
+}   /* comments */

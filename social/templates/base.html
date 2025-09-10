@@ -10,6 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tru devCentral</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <!-- Prism theme -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -92,6 +95,49 @@
 
         document.addEventListener('DOMContentLoaded', addPasswordToggles);
     </script>
+
+    <!-- PrismJS Syntax Highlighting -->
+    
+
+    <script>
+    // Convert triple-backtick fenced blocks to <pre><code>
+    function convertFences(root) {
+        const blocks = root.querySelectorAll('[data-post-body]');
+        blocks.forEach(el => {
+        if (el.dataset.fencesConverted === '1') return;
+        const raw = el.textContent;
+        const fenceRE = /```([a-zA-Z0-9+#\-_.]*)\n([\s\S]*?)```/g;
+        let outHTML = '', idx = 0, match;
+        while ((match = fenceRE.exec(raw)) !== null) {
+            outHTML += raw.slice(idx, match.index)
+            .replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
+            const lang = (match[1] || 'plaintext').toLowerCase();
+            const escCode = match[2].replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
+            outHTML += `<pre><code class="language-${lang}">${escCode}</code></pre>`;
+            idx = match.index + match[0].length;
+        }
+        outHTML += raw.slice(idx).replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s])).replace(/\n/g,'<br>');
+        el.innerHTML = outHTML;
+        el.dataset.fencesConverted = '1';
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        convertFences(document);
+        if (window.Prism) Prism.highlightAll();
+    });
+    </script>
+
+    <!-- Multi-Language Support -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+    // Load minified language components from the CDN
+    Prism.plugins.autoloader.languages_path =
+        'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+    Prism.plugins.autoloader.use_minified = true;
+    </script>
+
 
     <footer class="dc-footer">
         <div class="wrap">

@@ -1,0 +1,17 @@
+<article class="post-card">
+  <header class="post-header">
+    <a href="{% url 'profile' post.author.username %}" class="username">@{{ post.author.username }}</a>
+    <!-- Follow/Unfollow buttons if you show them here -->
+  </header>
+
+  {% if post.rendered_html %}
+    <div class="post-body markdown-output">{{ post.rendered_html|safe }}</div>
+  {% else %}
+    <div class="post-body" data-post-body>{{ post.body }}</div>
+  {% endif %}
+
+  {% if post.image %}
+    <img class="post-image" src="{{ post.image.url }}" alt="post image">
+  {% endif %}
+  <!-- reactions / replies UI here -->
+</article>

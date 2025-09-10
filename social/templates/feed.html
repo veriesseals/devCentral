@@ -48,7 +48,19 @@
       <!-- End New Follow buttons -->
 
     </div>
-    <p>{{ post.body }}</p>
+
+    <!-- <p>{{ post.body }}</p> -->
+    <div class="post-body" data-post-body>{{ post.body }}</div>
+    <div class="post-body markdown-output">
+      {{ post.rendered_html|safe }}
+    </div>
+
+    <!-- Use it in feed and profile -->
+    {% for post in posts %}
+      {% include "_post_item.html" with post=post %}
+    {% endfor %}
+
+
     {% if post.image %}<img class="post-image" src="{{ post.image.url }}" alt="post image">{% endif %}
     <div class="actions">
       <a href="{% url 'post-react' post.id 'like' %}">👍 {{ post.likes_count }}</a>

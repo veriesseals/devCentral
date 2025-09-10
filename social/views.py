@@ -7,6 +7,8 @@ from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from .utils import render_markdown
+from social.utils import render_markdown
 from .forms import SignUpForm, PostForm, ReplyForm, ProfileForm
 from .models import Post, Reaction, Share
 
@@ -34,7 +36,11 @@ def signup_view(request):
 def feed_view(request):
     following_ids = request.user.following.values_list('id', flat=True)
     posts = Post.objects.filter(Q(author=request.user) | Q(author__id__in=following_ids)).order_by('-created_at')
+    for p in posts:
+        p.rendered_html = render_markdown(p.body)
     return render(request, 'feed.html', {'posts': posts, 'post_form': PostForm(), 'reply_form': ReplyForm()})
+
+
 
 # create post view
 # -----------------------------------------------
