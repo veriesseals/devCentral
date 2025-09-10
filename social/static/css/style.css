@@ -12,11 +12,18 @@
   box-sizing:border-box
 }
 
+html, body {
+   height: 100%;
+}
+
 body {
   margin:0;
   font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;
   color:var(--text);
-  background:var(--bg)
+  background:var(--bg);
+  min-height: 100svh;           /* support mobile safe viewport units */
+  display: flex;
+  flex-direction: column;
 }
 
 .wrap {
@@ -25,14 +32,71 @@ body {
 }
 .dc-header {
   background:var(--teal);
-  color:#fff
+  color:#fff;
+  flex: 0 0 auto;
 }
-.dc-header .wrap {
+/* Header layout + vertical centering */
+.dc-header .wrap{
+  display:flex;
+  align-items:center;              /* centers logo/text vertically */
+  justify-content:space-between;
+}
+
+.dc-header nav{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  padding:12px 0
+  gap:12px;                        /* space between pills */
 }
+
+/* Unified “pill” style for links & the logout button */
+.dc-header .nav-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:40px;                     /* consistent hit-area */
+  padding:0 14px;
+  border-radius:9999px;
+  text-decoration:none;
+  color:#fff;
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  transition:background .2s ease, transform .12s ease;
+  line-height:1;                   /* avoids off-center text on hover */
+}
+
+/* Hover/focus effect (rollover) */
+.dc-header .nav-pill:hover,
+.dc-header .nav-pill:focus-visible{
+  background:rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+
+/* Active/click */
+.dc-header .nav-pill:active{
+  transform:translateY(0);
+}
+
+/* Make the logout button look like the links */
+.dc-header .btn-logout{
+  font:inherit;                    /* match header font */
+  color:#fff;
+  background:transparent;
+}
+
+/* If you had old button/link rules that fight these, keep this stronger selector */
+.dc-header nav a.btn,
+.dc-header nav a,
+.dc-header .inline-logout .btn{
+  box-shadow:none;                 /* optional: keep pills flat */
+}
+
+/* Your <main> block should expand to fill available space */
+main { 
+  flex: 1 0 auto;
+  min-height: 0;                /* prevents overflow issues in some browsers */
+}
+
 .brand {
   display:flex;
   gap:12px;
@@ -235,9 +299,15 @@ textarea {
 
 .dc-footer {
   border-top: 1px solid #e2e8f0;
-  margin-top: 24px;
   background: var(--teal);
   color: white;
+  flex: 0 0 auto;
+  margin-top: auto;
+  /* keep it a normal flow element (not fixed/absolute) */
+  position: static;
+  width: 100%;
+  /* optional: safe area padding for iOS devices with a home indicator */
+  padding-bottom: calc(var(--footer-padding-bottom, 0px) + env(safe-area-inset-bottom));
 }
 
 .dc-footer .wrap {
