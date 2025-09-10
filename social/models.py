@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 User = settings.AUTH_USER_MODEL
 
 # Helper functions for upload paths
@@ -29,6 +30,7 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to=avatar_upload_path, blank=True, null=True)
     bio = models.CharField(max_length=280, blank=True)
     followers = models.ManyToManyField('auth.User', related_name='following', blank=True)
+    
     def __str__(self): return self.user.username
 
 # Post model with reactions and shares
@@ -38,9 +40,19 @@ class Post(models.Model):
     body = models.TextField(max_length=1000)
     image = models.ImageField(upload_to=post_upload_path, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
-    def likes_count(self): return self.reactions.filter(kind=Reaction.LIKE).count()
-    def dislikes_count(self): return self.reactions.filter(kind=Reaction.DISLIKE).count()
-    def shares_count(self): return self.shares.count()
+    
+    # ✅ add these three fields
+    likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
+    dislikes = models.ManyToManyField(User, related_name="disliked_posts", blank=True)
+    shares_count = models.PositiveIntegerField(default=0)
+    
+    # in social/models.py inside Post model
+    likes_count = models.PositiveIntegerField(default=0)
+    
+    dislikes_count = models.PositiveIntegerField(default=0)
+    
+    shares_count = models.PositiveIntegerField(default=0)
+
 
 # Reply model for comments on posts
 # -----------------------------------------------
@@ -71,26 +83,17 @@ class Share(models.Model):
 
 # Create CodeSnippet model for sharing code snippets
 # -----------------------------------------------
+# --- ADD THIS if not present ---
 class CodeSnippet(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="snippets")
     title = models.CharField(max_length=100, blank=True)
+    language = models.CharField(max_length=32, default="python")
     code = models.TextField()
-    language = models.CharField(
-        max_length=50,
-        choices=[
-            ("python", "Python"),
-            ("javascript", "JavaScript"),
-            ("java", "Java"),
-            ("cpp", "C++"),
-            ("csharp", "C#"),
-            ("html", "HTML"),
-            ("css", "CSS"),
-            ("sql", "SQL"),
-        ],
-        default="python"
-    )
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.author.username} – {self.title or 'Untitled'}"
+        return self.title or f"{self.author.username} • {self.language}"
 

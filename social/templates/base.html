@@ -138,6 +138,12 @@
     Prism.plugins.autoloader.use_minified = true;
     </script>
 
+    {% if messages %}
+        <div class="flash">
+            {% for m in messages %}<div class="flash-item">{{ m }}</div>{% endfor %}
+        </div>
+    {% endif %}
+
 
     <footer class="dc-footer">
         <div class="wrap">

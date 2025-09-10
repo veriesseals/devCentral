@@ -1,0 +1,18 @@
+<article class="snippet-card">
+  <header class="post-header">
+    <a href="{% url 'profile' snippet.author.username %}" class="username">@{{ snippet.author.username }}</a>
+    {% if user == snippet.author %}
+      <span class="post-actions">
+        <a href="{% url 'snippet-edit' snippet.pk %}" class="btn btn-ghost">Edit</a>
+        <form action="{% url 'snippet-delete' snippet.pk %}" method="post" style="display:inline;" onsubmit="return confirm('Delete this code snippet?');">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+      </span>
+    {% endif %}
+  </header>
+
+  {% if snippet.title %}<h3>{{ snippet.title }} ({{ snippet.language }})</h3>{% endif %}
+  <pre><code class="language-{{ snippet.language|default:'plaintext' }}">{{ snippet.code|escape }}</code></pre>
+</article>
+

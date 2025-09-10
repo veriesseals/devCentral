@@ -1,5 +1,7 @@
-{% extends 'base.html' %}{% load static %}
+{% extends 'base.html' %}
+{% load static %}
 {% block content %}
+
 <section class="compose-card">
   <form action="{% url 'post-create' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -11,74 +13,107 @@
   </form>
 </section>
 
-{% for post in posts %}
-<article class="post-card">
-  <div class="avatar">
-    {% if post.author.profile.avatar %}
-    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
-    {% else %}
-    <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
-    {% endif %}
-  </div>
-  <div class="content">
-    <div class="meta">
-      <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
-      <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
-      <a class="follow" href="{% url 'follow-toggle' post.author.username %}">Follow/Unfollow</a>
+{% if posts %}
+  {% for post in posts %}
+  <article class="post-card">
+    <div class="avatar">
+      {% if post.author.profile.avatar %}
+        <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
+      {% else %}
+        <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+      {% endif %}
+    </div>
 
-      <!-- New Follow/UnFollow Buttons -->
+    <div class="content">
       <div class="meta">
         <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
+        <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
 
+        {# Follow / Unfollow (POST) #}
         {% if user.is_authenticated and user != post.author %}
-        {% if user in post.author.profile.followers.all %}
-        <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn-unfollow">Unfollow</button>
-        </form>
-        {% else %}
-        <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn-follow">Follow</button>
-        </form>
-        {% endif %}
+          {% if user in post.author.profile.followers.all %}
+            <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-unfollow">Unfollow</button>
+            </form>
+          {% else %}
+            <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-follow">Follow</button>
+            </form>
+          {% endif %}
         {% endif %}
       </div>
 
-      <!-- End New Follow buttons -->
+      {# Body (plain and rendered markdown with code highlighting) #}
+      <div class="post-body" data-post-body>{{ post.body }}</div>
+      <div class="post-body markdown-output">
+        {{ post.rendered_html|safe }}
+      </div>
 
+      {% if post.image %}
+        <img class="post-image" src="{{ post.image.url }}" alt="post image">
+      {% endif %}
+
+      {# Reactions (POST). Keep these INSIDE the loop so post.id exists. #}
+      <div class="actions">
+        <form action="{% url 'post-react' post.id 'like' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-like">👍 {{ post.likes_count }}</button>
+        </form>
+
+        <form action="{% url 'post-react' post.id 'dislike' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-dislike">👎 {{ post.dislikes_count }}</button>
+        </form>
+
+        <form action="{% url 'post-share' post.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
+        </form>
+
+        {# Edit / Delete (owner-only) #}
+        {% if user.is_authenticated and user == post.author %}
+          <a class="btn btn-small" href="{% url 'post-edit' post.id %}">Edit</a>
+          <form action="{% url 'post-delete' post.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-small"
+                    onclick="return confirm('Delete this post?');">Delete</button>
+          </form>
+        {% endif %}
+      </div>
+
+      {# Replies #}
+      <details class="replies">
+        <summary>Replies ({{ post.replies.count }})</summary>
+        <ul>
+          {% for r in post.replies.all %}
+            <li>
+              <strong>@{{ r.author.username }}</strong>
+              {{ r.body }}
+              <em>{{ r.created_at|date:"M d H:i" }}</em>
+            </li>
+          {% empty %}
+            <li>No replies yet.</li>
+          {% endfor %}
+        </ul>
+
+        {% if user.is_authenticated %}
+          <form action="{% url 'post-reply' post.id %}" method="post">
+            {% csrf_token %}
+            {{ reply_form.body }}
+            <button class="btn" type="submit">Reply</button>
+          </form>
+        {% endif %}
+      </details>
     </div>
+  </article>
+  {% endfor %}
+{% else %}
+  <p>No posts yet. Say hi! 👋</p>
+{% endif %}
 
-    <!-- <p>{{ post.body }}</p> -->
-    <div class="post-body" data-post-body>{{ post.body }}</div>
-    <div class="post-body markdown-output">
-      {{ post.rendered_html|safe }}
-    </div>
-
-    <!-- Use it in feed and profile -->
-    {% for post in posts %}
-      {% include "_post_item.html" with post=post %}
-    {% endfor %}
-
-
-    {% if post.image %}<img class="post-image" src="{{ post.image.url }}" alt="post image">{% endif %}
-    <div class="actions">
-      <a href="{% url 'post-react' post.id 'like' %}">👍 {{ post.likes_count }}</a>
-      <a href="{% url 'post-react' post.id 'dislike' %}">👎 {{ post.dislikes_count }}</a>
-      <a href="{% url 'post-share' post.id %}">🔁 {{ post.shares_count }}</a>
-    </div>
-    <details class="replies">
-      <summary>Replies ({{ post.replies.count }})</summary>
-      <ul>
-        {% for r in post.replies.all %}
-        <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
-        {% empty %}<li>No replies yet.</li>{% endfor %}
-      </ul>
-      <form action="{% url 'post-reply' post.id %}" method="post">
-        {% csrf_token %} {{ reply_form.body }} <button class="btn" type="submit">Reply</button>
-      </form>
-    </details>
-  </div>
-</article>
-{% empty %}<p>No posts yet. Say hi! 👋</p>{% endfor %}
 {% endblock %}

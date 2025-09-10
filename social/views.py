@@ -1,16 +1,29 @@
 from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.http import HttpResponseNotAllowed
+
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+
 from django.urls import reverse
-from .utils import render_markdown
-from social.utils import render_markdown
+from .utils import render_markdown # if you’re using server-side markdown
+from social.utils import render_markdown 
 from .forms import SignUpForm, PostForm, ReplyForm, ProfileForm
 from .models import Post, Reaction, Share
+from .models import Post, CodeSnippet
+from .forms import PostForm, CodeSnippetForm
+from .models import Post, Reply  # adjust if your Reply model is elsewhere
+from .forms import ReplyForm
+
+# --- add these imports at the top if not present ---
+from django.contrib.auth.decorators import login_required
+from django.db.models import F
+from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseNotAllowed, HttpResponseForbidden
+from django.shortcuts import render
+
+from .models import Post  # ensure Post is imported
 
 # signup view
 # -----------------------------------------------
@@ -54,6 +67,96 @@ def create_post(request):
             obj.save()
     return redirect('feed')
 
+# edit post view
+# -----------------------------------------------
+@login_required
+def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return HttpResponseForbidden("You can only edit your own posts.")
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Post updated.")
+            return redirect('profile', username=request.user.username)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'post_edit.html', {'form': form, 'post': post})
+
+@login_required
+def post_reply(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    post = get_object_or_404(Post, pk=pk)
+    form = ReplyForm(request.POST)
+    if form.is_valid():
+        r = form.save(commit=False)
+        r.post = post
+        r.author = request.user
+        r.save()
+    return redirect(request.POST.get("next") or "feed")
+
+# delete post view
+# -----------------------------------------------
+@login_required
+def post_delete(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(['POST'])
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return HttpResponseForbidden("You can only delete your own posts.")
+    post.delete()
+    messages.success(request, "Post deleted.")
+    return redirect('profile', username=request.user.username)
+
+
+# create code snippet view
+# -----------------------------------------------
+@login_required
+def snippet_edit(request, pk):
+    snippet = get_object_or_404(CodeSnippet, pk=pk)
+    if snippet.author != request.user:
+        return HttpResponseForbidden("You can only edit your own code snippets.")
+    if request.method == "POST":
+        form = CodeSnippetForm(request.POST, instance=snippet)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Code snippet updated.")
+            return redirect('profile', username=request.user.username)
+    else:
+        form = CodeSnippetForm(instance=snippet)
+    return render(request, 'snippet_edit.html', {'form': form, 'snippet': snippet})
+
+# create code snippet view
+# -----------------------------------------------
+@login_required
+def snippet_create(request):
+    if request.method == "POST":
+        form = CodeSnippetForm(request.POST)
+        if form.is_valid():
+            snippet = form.save(commit=False)
+            snippet.author = request.user
+            snippet.save()
+            messages.success(request, "Code snippet posted.")
+            return redirect('profile', username=request.user.username)
+    else:
+        form = CodeSnippetForm()
+    return render(request, 'snippet_edit.html', {'form': form})  # reuse template
+
+# delete code snippet view
+# -----------------------------------------------
+@login_required
+def snippet_delete(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(['POST'])
+    snippet = get_object_or_404(CodeSnippet, pk=pk)
+    if snippet.author != request.user:
+        return HttpResponseForbidden("You can only delete your own code snippets.")
+    snippet.delete()
+    messages.success(request, "Code snippet deleted.")
+    return redirect('profile', username=request.user.username)
+
 # add reply view
 # -----------------------------------------------
 @login_required
@@ -69,31 +172,56 @@ def add_reply(request, post_id):
 # react (like/dislike) view
 # -----------------------------------------------
 @login_required
-def react(request, post_id, kind):
-    post = get_object_or_404(Post, id=post_id)
-    # toggle
-    q = Reaction.objects.filter(post=post, user=request.user, kind=kind)
-    if q.exists(): q.delete()
-    else: Reaction.objects.create(post=post, user=request.user, kind=kind)
-    return redirect('feed')
+def post_react(request, pk, action):
+    """
+    Handles like/dislike for a Post by incrementing counters.
+    Expects POST only. Redirects back to ?next= or 'feed'.
+    """
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    post = get_object_or_404(Post, pk=pk)
+
+    if action == "like":
+        Post.objects.filter(pk=post.pk).update(likes_count=F("likes_count") + 1)
+    elif action == "dislike":
+        Post.objects.filter(pk=post.pk).update(dislikes_count=F("dislikes_count") + 1)
+    else:
+        # unknown action: just ignore and bounce back
+        pass
+
+    return redirect(request.POST.get("next") or "feed")
 
 # share post view
 # -----------------------------------------------
 @login_required
-def share_post(request, post_id):
-    Share.objects.create(post_id=post_id, user=request.user)
-    messages.success(request, 'Post shared!')
-    return redirect('feed')
+def post_share(request, pk):
+    """
+    Handles share count for a Post. POST only.
+    """
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    post = get_object_or_404(Post, pk=pk)
+    Post.objects.filter(pk=post.pk).update(shares_count=F("shares_count") + 1)
+
+    return redirect(request.POST.get("next") or "feed")
 
 # follow/unfollow view
 # -----------------------------------------------
 @login_required
-def toggle_follow(request, username):
+def follow_toggle(request, username):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(['POST'])
     target = get_object_or_404(User, username=username)
-    prof = target.profile
-    if request.user in prof.followers.all(): prof.followers.remove(request.user)
-    else: prof.followers.add(request.user)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('feed')))
+    if target == request.user:
+        return redirect('profile', username=username)
+    profile = target.profile
+    if request.user in profile.followers.all():
+        profile.followers.remove(request.user)
+    else:
+        profile.followers.add(request.user)
+    return redirect('profile', username=target.username)
 
 # profile view (with edit option if own profile)
 # -----------------------------------------------

@@ -119,6 +119,41 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+/* Subtle ghost button (for Edit) */
+.btn-ghost {
+  background: transparent;
+  color: var(--teal);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--teal);
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.btn-ghost:hover {
+  background: var(--teal);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Danger button (Delete) */
+.btn-danger {
+  background: #e11d48; /* red */
+  color: white;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+}
+.btn-danger:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+
+/* Optional secondary */
+.btn-secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.post-actions { float: right; display: inline-flex; gap: 8px; }
 
 
 
