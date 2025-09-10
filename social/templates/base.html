@@ -1,158 +1,129 @@
 {% load static %}
-{% load static %}
 {% load tz %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tru devCentral</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    <!-- Prism theme -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tru devCentral</title>
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+  <!-- Prism theme (one line only) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
 
 <body>
-    <header class="dc-header">
-        <div class="wrap">
-            <div class="brand">
-                <!-- LOGO SLOT (header): replace this source with your real logo -->
-                <img src="{% static 'img/dev_central_logo.png' %}" class="logo" alt="DevCentral" />
-                <h1>Tru devCentral</h1>
-            </div>
-            <nav>
-                {% if user.is_authenticated %}
-                <a href="{% url 'feed' %}">My Post</a>
-                <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
+  <header class="dc-header">
+    <div class="wrap">
+      <div class="brand">
+        <img src="{% static 'img/dev_central_logo.png' %}" class="logo" alt="DevCentral" />
+        <h1>Tru devCentral</h1>
+      </div>
 
-                {% if user.is_authenticated %}
-                <form action="{% url 'logout' %}" method="post" class="inline-logout">
-                    {% csrf_token %}
-                    <button type="submit" class="inline-logout btn brand">Logout</button>
+      <nav>
+        {% if user.is_authenticated %}
+          <a href="{% url 'feed' %}">HOME FEED</a>
+          <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
 
-                </form>
+          <form action="{% url 'logout' %}" method="post" class="inline-logout">
+            {% csrf_token %}
+            <button type="submit" class="inline-logout btn brand">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn">Login</a>
+          <a class="btn brand" href="{% url 'signup' %}">Sign up</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
 
-                {% else %}
-                <button type="submit" class="btn">Log in</button>
-                <a href="{% url 'signup' %}" class="btn">Sign up</a>
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
 
-                {% endif %}
+  <!-- Password Visibility Toggle -->
+  <script>
+    function addPasswordToggles() {
+      const pwInputs = document.querySelectorAll('input[type="password"]');
+      pwInputs.forEach((input) => {
+        if (input.closest('.pw-field')) return;
 
-                {% else %}
-                <a href="{% url 'login' %}" class="btn">Login</a>
-                <a class="btn brand" href="{% url 'signup' %}">Sign up</a>
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pw-field';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
 
-                {% endif %}
-            </nav>
-        </div>
-    </header>
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pw-toggle';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', 'Show password');
+        btn.innerHTML = '<span class="eye">👁️</span> Show';
 
-    <main class="wrap">{% block content %}{% endblock %}</main>
+        btn.addEventListener('click', () => {
+          const showing = input.type === 'text';
+          input.type = showing ? 'password' : 'text';
+          btn.setAttribute('aria-pressed', String(!showing));
+          btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+          btn.innerHTML = showing ? '<span class="eye">👁️</span> Show' : '🙈 Hide';
+          input.focus();
+          const v = input.value; input.value = ''; input.value = v;
+        });
 
-    <!-- Password Visibility Toggle -->
-    <script>
-        // Enhance all password inputs with a Show/Hide toggle (Login + Signup + any other forms)
-        function addPasswordToggles() {
-            const pwInputs = document.querySelectorAll('input[type="password"]');
-            pwInputs.forEach((input) => {
-                // If already enhanced, skip
-                if (input.closest('.pw-field')) return;
+        wrapper.appendChild(btn);
+      });
+    }
+    document.addEventListener('DOMContentLoaded', addPasswordToggles);
+  </script>
 
-                // Wrap the input
-                const wrapper = document.createElement('div');
-                wrapper.className = 'pw-field';
-                input.parentNode.insertBefore(wrapper, input);
-                wrapper.appendChild(input);
-
-                // Create toggle button
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'pw-toggle';
-                btn.setAttribute('aria-pressed', 'false');
-                btn.setAttribute('aria-label', 'Show password');
-                btn.innerHTML = '<span class="eye">👁️</span> Show';
-
-                // Toggle logic
-                btn.addEventListener('click', () => {
-                    const showing = input.type === 'text';
-                    input.type = showing ? 'password' : 'text';
-                    btn.setAttribute('aria-pressed', String(!showing));
-                    btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
-                    btn.innerHTML = showing ? '<span class="eye">👁️</span> Show' : '🙈 Hide';
-                    // Keep cursor at end for better UX
-                    input.focus();
-                    const val = input.value;
-                    input.value = '';
-                    input.value = val;
-                });
-
-                wrapper.appendChild(btn);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', addPasswordToggles);
-    </script>
-
-    <!-- PrismJS Syntax Highlighting -->
-    
-
-    <script>
-    // Convert triple-backtick fenced blocks to <pre><code>
+  <!-- Convert fenced ```lang blocks into <pre><code class="language-..."> for Prism -->
+  <script>
     function convertFences(root) {
-        const blocks = root.querySelectorAll('[data-post-body]');
-        blocks.forEach(el => {
+      const blocks = root.querySelectorAll('[data-post-body]');
+      blocks.forEach(el => {
         if (el.dataset.fencesConverted === '1') return;
         const raw = el.textContent;
         const fenceRE = /```([a-zA-Z0-9+#\-_.]*)\n([\s\S]*?)```/g;
-        let outHTML = '', idx = 0, match;
-        while ((match = fenceRE.exec(raw)) !== null) {
-            outHTML += raw.slice(idx, match.index)
-            .replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
-            const lang = (match[1] || 'plaintext').toLowerCase();
-            const escCode = match[2].replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
-            outHTML += `<pre><code class="language-${lang}">${escCode}</code></pre>`;
-            idx = match.index + match[0].length;
+        let outHTML = '', idx = 0, m;
+        const esc = s => s.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+        while ((m = fenceRE.exec(raw)) !== null) {
+          outHTML += esc(raw.slice(idx, m.index));
+          const lang = (m[1] || 'plaintext').toLowerCase();
+          outHTML += `<pre><code class="language-${lang}">${esc(m[2])}</code></pre>`;
+          idx = m.index + m[0].length;
         }
-        outHTML += raw.slice(idx).replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s])).replace(/\n/g,'<br>');
+        outHTML += esc(raw.slice(idx)).replace(/\n/g,'<br>');
         el.innerHTML = outHTML;
         el.dataset.fencesConverted = '1';
-        });
+      });
     }
     document.addEventListener('DOMContentLoaded', () => {
-        convertFences(document);
-        if (window.Prism) Prism.highlightAll();
+      convertFences(document);
+      if (window.Prism) Prism.highlightAll();
     });
-    </script>
+  </script>
 
-    <!-- Multi-Language Support -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>
-    // Load minified language components from the CDN
+  <!-- Prism core + autoloader (loads languages on demand) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
     Prism.plugins.autoloader.languages_path =
-        'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+      'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
     Prism.plugins.autoloader.use_minified = true;
-    </script>
+  </script>
 
-    {% if messages %}
-        <div class="flash">
-            {% for m in messages %}<div class="flash-item">{{ m }}</div>{% endfor %}
-        </div>
-    {% endif %}
+  {% if messages %}
+    <div class="flash">
+      {% for m in messages %}<div class="flash-item">{{ m }}</div>{% endfor %}
+    </div>
+  {% endif %}
 
-
-    <footer class="dc-footer">
-        <div class="wrap">
-            <span>Tru devCentral &copy; • Copyright 2025</span>
-            <span>• Developed by: Veries Seals III • Updated: {{ current_time|date:"M d, Y H:i:s" }}
-            </span>
-
-        </div>
-    </footer>
+  <footer class="dc-footer">
+    <div class="wrap">
+      <span>Tru devCentral &copy; • Copyright 2025</span>
+      <span>• Developed by: Veries Seals III • Updated: {{ current_time|date:"M d, Y H:i:s" }}</span>
+    </div>
+  </footer>
 </body>
-
 </html>

@@ -1,5 +1,5 @@
 {% load static %}
-
+{# Renders a single post. Shared by feed.html and profile.html #}
 <article class="post-card">
   <div class="avatar">
     {% if post.author.profile.avatar %}
@@ -13,35 +13,20 @@
     <div class="meta">
       <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
       <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
-
-      {# --- Choose ONE follow UI. You asked for separate Follow/Unfollow buttons with hover effects. Keep this block: --- #}
-      {% if user.is_authenticated and user != post.author %}
-        {% if user in post.author.profile.followers.all %}
-          <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn-unfollow">Unfollow</button>
-          </form>
-        {% else %}
-          <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn-follow">Follow</button>
-          </form>
-        {% endif %}
-      {% endif %}
     </div>
 
-    {# Markdown/Code output #}
-    <div class="post-body markdown-output">
-      {{ post.rendered_html|safe }}
-    </div>
+    {% if post.rendered_html %}
+      <div class="post-body markdown-output">
+        {{ post.rendered_html|safe }}
+      </div>
+    {% else %}
+      <div class="post-body" data-post-body>{{ post.body }}</div>
+    {% endif %}
 
     {% if post.image %}
       <img class="post-image" src="{{ post.image.url }}" alt="post image">
     {% endif %}
 
-    {# Reactions (POST, not GET) #}
     <div class="actions">
       <form action="{% url 'post-react' post.id 'like' %}" method="post" style="display:inline;">
         {% csrf_token %}
@@ -60,31 +45,17 @@
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
         <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
       </form>
-
-      {% if user == post.author %}
-        <a class="btn-edit" href="{% url 'post-edit' post.id %}">Edit</a>
-        <form action="{% url 'post-delete' post.id %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn-delete" onclick="return confirm('Delete this post?');">Delete</button>
-        </form>
-      {% endif %}
     </div>
 
-    {# Replies #}
     <details class="replies">
       <summary>Replies ({{ post.replies.count }})</summary>
       <ul>
         {% for r in post.replies.all %}
-          <li>
-            <strong>@{{ r.author.username }}</strong>
-            <span class="reply-time">{{ r.created_at|date:"M d H:i" }}</span>
-            <div class="reply-body">{{ r.body }}</div>
-          </li>
+          <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
         {% empty %}
           <li>No replies yet.</li>
         {% endfor %}
       </ul>
-
       <form action="{% url 'post-reply' post.id %}" method="post">
         {% csrf_token %}
         {{ reply_form.body }}

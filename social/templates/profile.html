@@ -1,88 +1,49 @@
-{% extends 'base.html' %}{% load static %}
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
 <div class="profile">
-    <div class="avatar lg">
-        {% if profile_user.profile.avatar %}
-        <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
-        {% else %}
-        <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
-        {% endif %}
-    </div>
+  <div class="avatar lg">
+    {% if profile_user.profile.avatar %}
+      <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
+    {% else %}
+      <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+    {% endif %}
+  </div>
 </div>
+
 <h2>@{{ profile_user.username }}</h2>
 <p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
 <p>{{ profile_user.profile.bio }}</p>
 
-<!-- Follow/Unfollow button -->
-{% if user != profile_user %}
-<a class="btn" href="{% url 'follow-toggle' profile_user.username %}">
-    {% if is_following %}Unfollow{% else %}Follow{% endif %}
-</a>
-{% else %}
-
-<!-- New Follow/Unfollow buttons -->
-{% if user != profile_user %}
-{% if user in profile_user.profile.followers.all %}
-
-<!-- Already following -->
-<form action="{% url 'unfollow' profile_user.username %}" method="post" class="inline-form">
-    {% csrf_token %}
-    <button type="submit" class="btn-unfollow">Unfollow</button>
-</form>
-{% else %}
-<!-- Not following yet -->
-<form action="{% url 'follow' profile_user.username %}" method="post" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" class="btn-follow">Follow</button>
-</form>
-{% endif %}
+{% if user.is_authenticated and user != profile_user %}
+  {% if user in profile_user.profile.followers.all %}
+    <form action="{% url 'unfollow' profile_user.username %}" method="post" class="inline-form">
+      {% csrf_token %}
+      <button type="submit" class="btn-unfollow">Unfollow</button>
+    </form>
+  {% else %}
+    <form action="{% url 'follow' profile_user.username %}" method="post" class="inline-form">
+      {% csrf_token %}
+      <button type="submit" class="btn-follow">Follow</button>
+    </form>
+  {% endif %}
 {% endif %}
 
-
-
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %} {{ form.as_p }}
+{% if user.is_authenticated and user == profile_user %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
     <button class="btn" type="submit">Update Profile</button>
-</form>
+  </form>
 {% endif %}
-
-</div>
 
 <hr>
-<!-- POST -->
 <h3>Posts</h3>
 
-<!-- Use it in feed and profile -->
 {% for post in posts %}
-  {% include "_post_item.html" with post=post %}
+  {% include "social/_post_item.html" with post=post %}
 {% empty %}
-
   <p>No posts yet.</p>
 {% endfor %}
-<div class="post-body markdown-output">
-  {{ post.rendered_html|safe }}
-</div>
-{% for post in posts %}
-<p>{{ post.body }} <em>{{ post.created_at|date:"M d, Y H:i" }}</em></p>
-{% empty %}<p>No posts yet.</p>{% endfor %}
 {% endblock %}
-
-<div class="meta">
-  <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
-  <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
-
-  {% if user.is_authenticated and user != post.author %}
-    {% if user in post.author.profile.followers.all %}
-      <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn-unfollow">Unfollow</button>
-      </form>
-    {% else %}
-      <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn-follow">Follow</button>
-      </form>
-    {% endif %}
-  {% endif %}
-</div>
