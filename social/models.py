@@ -5,79 +5,61 @@ User = settings.AUTH_USER_MODEL
 
 # Helper functions for upload paths
 # -----------------------------------------------
+
+# Models
+# -----------------------------------------------
 def avatar_upload_path(instance, filename):
-    return f'avatars/{instance.user.id}/{filename}'
+    return f'avatars/{instance.user_id}/{filename}'
 
 def post_upload_path(instance, filename):
-    return f'posts/{instance.user.id}/{filename}'
+    return f'posts/{instance.user_id}/{filename}'
 
-
-
-
-# Create your models here.
+# Profile model
 # -----------------------------------------------
-
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
-    avatar = models.ImageField(upload_to = avatar_upload_path, blank = True, null = True)
-    bio = models.CharField(max_length = 280, blank = True)
-    # followers: “who follows me?”
-    followers = models.ManyToManyField(User, related_name = "following", blank = True)
-    
-    
-    def __str__(self):
-        return self.user.username
-    
-# Create Post model
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to=avatar_upload_path, blank=True, null=True)
+    bio = models.CharField(max_length=280, blank=True)
+    followers = models.ManyToManyField('auth.User', related_name='following', blank=True)
+    def __str__(self): return self.user.username
+
+# Post model with reactions and shares
 # -----------------------------------------------
 class Post(models.Model):
-    author = models.ForeignKey(User, on_delete = models.CASCADE, related_name="posts")
-    image = models.ImageField(upload_to = post_upload_path, blank=True, null=True, null = True)
-    created_at = models.DateTimeField(default = timezone.now)
-    
-    def likes_count(self):
-        return self.reactions.filter(kind = Reaction.LIKE).count()
-    
-    def dislikes_count(self):
-        return self.reactions.filter(kind = Reaction.DISLIKE).count()
-    
-    def shares_count(self):
-        return self.shares_count()
-    
-    def __str__(self):
-        return f'{self.author.username}: {self.body[:30]}'
-    
-    
-# Create Reply model for comments
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='posts')
+    body = models.TextField(max_length=1000)
+    image = models.ImageField(upload_to=post_upload_path, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    def likes_count(self): return self.reactions.filter(kind=Reaction.LIKE).count()
+    def dislikes_count(self): return self.reactions.filter(kind=Reaction.DISLIKE).count()
+    def shares_count(self): return self.shares.count()
+
+# Reply model for comments on posts
 # -----------------------------------------------
 class Reply(models.Model):
-    post = models.ForeignKey(Post, on_delete = models.CASCADE, related_name="replies")
-    author = models.ForeignKey(User, on_delete = models.CASCADE)
-    body = models.TextField(max_length = 500)
-    created_at = models.DateTimeField(default = timezone.now)
-    
-    
-# Create Reaction model for likes/dislikes
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='replies')
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    body = models.TextField(max_length=500)
+    created_at = models.DateTimeField(default=timezone.now)
+
+# Reaction model for likes/dislikes
 # -----------------------------------------------
 class Reaction(models.Model):
-    LIKE = 'like'
-    DISLIKE = 'dislike'
-    KIND_CHOICES = [(LIKE, 'Like'), (DISLIKE, 'Dislike')]
-    post = models.ForeignKey(Post, on_delete = models.CASCADE, related_name="reactions")
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    kind = models.CharField(max_length = 7, choices = KIND_CHOICES)
-    created_at = models.DateTimeField(default = timezone.now)
-    
-    class Meta:
-        unique_together = ('post', 'user', 'kind') # one like/dislike per user 
-        
+    LIKE, DISLIKE = 'like','dislike'
+    KIND_CHOICES = [(LIKE,'Like'),(DISLIKE,'Dislike')]
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='reactions')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    kind = models.CharField(max_length=7, choices=KIND_CHOICES)
+    created_at = models.DateTimeField(default=timezone.now)
+    class Meta: unique_together = ('post','user','kind')
 
-# Create Share model for sharing posts
+# Share model for sharing posts
 # -----------------------------------------------
 class Share(models.Model):
-    post = models.ForeignKey(Post, on_delete = models.CASCADE, related_name="shares")
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    created_at = models.DateTimeField(default = timezone.now)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='shares')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
 
 # Create CodeSnippet model for sharing code snippets
 # -----------------------------------------------
