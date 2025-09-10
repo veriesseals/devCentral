@@ -58,4 +58,29 @@ def create_post(request):
             obj.save()
     return redirect('feed')
 
+# Created add_reply
+# -----------------------------------------------
 @login_required
+def add_reply(request, post_id):
+    post = get_object_or_404(Post, id = post_id)
+    if request.method == 'POST':
+        form = ReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit = False)
+            reply.post = post
+            reply.author = request.user
+            reply.save()
+    return redirect('feed')
+
+
+# Created react
+# -----------------------------------------------
+@login_required
+def react(request, post_id, kind):
+    post = get_object_or_404(Post, id = post_id)
+    Reaction.objects.filter(post = post, user = request.user, kind = kind).delete()
+    # toggle: if deletion occurred, it un-reacted; otherwise create new
+    if not Reaction.objects.filter(post = post, user = request.user, kind = kind).exists():
+        Reaction.objects.create(post = post, user = request.user, kind = kind)
+    return redirect('feed')
+
