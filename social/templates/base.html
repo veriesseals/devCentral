@@ -48,10 +48,55 @@
 
     <main class="wrap">{% block content %}{% endblock %}</main>
 
+    <!-- Password Visibility Toggle -->
+    <script>
+        // Enhance all password inputs with a Show/Hide toggle (Login + Signup + any other forms)
+        function addPasswordToggles() {
+            const pwInputs = document.querySelectorAll('input[type="password"]');
+            pwInputs.forEach((input) => {
+                // If already enhanced, skip
+                if (input.closest('.pw-field')) return;
+
+                // Wrap the input
+                const wrapper = document.createElement('div');
+                wrapper.className = 'pw-field';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                // Create toggle button
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pw-toggle';
+                btn.setAttribute('aria-pressed', 'false');
+                btn.setAttribute('aria-label', 'Show password');
+                btn.innerHTML = '<span class="eye">👁️</span> Show';
+
+                // Toggle logic
+                btn.addEventListener('click', () => {
+                    const showing = input.type === 'text';
+                    input.type = showing ? 'password' : 'text';
+                    btn.setAttribute('aria-pressed', String(!showing));
+                    btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+                    btn.innerHTML = showing ? '<span class="eye">👁️</span> Show' : '🙈 Hide';
+                    // Keep cursor at end for better UX
+                    input.focus();
+                    const val = input.value;
+                    input.value = '';
+                    input.value = val;
+                });
+
+                wrapper.appendChild(btn);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', addPasswordToggles);
+    </script>
+
     <footer class="dc-footer">
         <div class="wrap">
             <span>Tru devCentral &copy; • Copyright 2025</span>
-            <span>• Developed by: Veries Seals III • Updated: {% now "d-m-Y H:i:s" as current_time %}{{ current_time }}</span>
+            <span>• Developed by: Veries Seals III • Updated: {% now "d-m-Y H:i:s" as current_time %}{{ current_time
+                }}</span>
 
         </div>
     </footer>

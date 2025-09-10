@@ -155,7 +155,7 @@ textarea {
   margin-bottom:20px
 }
 .logo-large img {
-  width:45.3%;
+  width:40%;
   max-width:50%;
   height:auto
 }
@@ -204,4 +204,49 @@ textarea {
 
 .inline-logout button:hover {
   text-decoration: underline;
+}
+
+/* Password Visibility Toggle */
+
+/* ==== Password toggle ==== */
+/* Password field wrapper */
+.pw-field {
+  position: relative;
+  display: inline-block;
+  width: auto;                /* ✅ don’t stretch full width */
+}
+
+/* Make input same width as normal Django inputs */
+.pw-field input[type="password"],
+.pw-field input[type="text"] {
+  width: 220px;               /* ✅ match Username input width */
+  padding-right: 3rem;        /* room for the Show button */
+  box-sizing: border-box;
+}
+
+
+.pw-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--teal-dark);
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+
+.pw-toggle:hover,
+.pw-toggle:focus {
+  outline: none;
+  background: #e8ffff;
+}
+
+/* Optional: small icon look */
+.pw-toggle .eye {
+  display: inline-block;
+  font-weight: 700;
 }
