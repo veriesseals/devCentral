@@ -24,7 +24,7 @@
 {% if user != profile_user %}
 {% if user in profile_user.profile.followers.all %}
 <!-- Already following -->
-<form action="{% url 'unfollow' profile_user.username %}" method="post" style="display:inline;">
+<form action="{% url 'unfollow' profile_user.username %}" method="post" class="inline-form">
     {% csrf_token %}
     <button type="submit" class="btn-unfollow">Unfollow</button>
 </form>

@@ -28,22 +28,22 @@
 
       <!-- New Follow/UnFollow Buttons -->
       <div class="meta">
-  <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
+        <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
 
-  {% if user.is_authenticated and user != post.author %}
-    {% if user in post.author.profile.followers.all %}
-      <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn-unfollow">Unfollow</button>
-      </form>
-    {% else %}
-      <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn-follow">Follow</button>
-      </form>
-    {% endif %}
-  {% endif %}
-</div>
+        {% if user.is_authenticated and user != post.author %}
+        {% if user in post.author.profile.followers.all %}
+        <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-unfollow">Unfollow</button>
+        </form>
+        {% else %}
+        <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-follow">Follow</button>
+        </form>
+        {% endif %}
+        {% endif %}
+      </div>
 
       <!-- End New Follow buttons -->
 
