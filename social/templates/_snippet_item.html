@@ -4,7 +4,7 @@
     {% if user == snippet.author %}
       <span class="post-actions">
         <a href="{% url 'snippet-edit' snippet.pk %}" class="btn btn-ghost">Edit</a>
-        <form action="{% url 'snippet-delete' snippet.pk %}" method="post" style="display:inline;" onsubmit="return confirm('Delete this code snippet?');">
+        <form action="{% url 'snippet-delete' snippet.pk %}" method="post" class="inline-form" onsubmit="return confirm('Delete this code snippet?');">
           {% csrf_token %}
           <button type="submit" class="btn-danger">Delete</button>
         </form>

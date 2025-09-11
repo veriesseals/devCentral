@@ -459,3 +459,18 @@ textarea {
 .codehilite .c {
    color: #9ca3af; 
 }   /* comments */
+
+/* Add this at the end of your existing CSS file */
+.inline-form {
+    display: inline;
+}
+
+.inline-form button {
+    background: none;
+    border: none;
+    color: var(--teal-dark);  /* match your link color */
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+    padding: 0;
+}

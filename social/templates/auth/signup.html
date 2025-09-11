@@ -5,9 +5,17 @@
     <img src="{% static 'img/devcentral-logo-placeholder.svg' %}" alt="DevCentral logo">
   </div>
   <h2>Create your DevCentral account</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %} {{ form.as_p }}
-    <a href="{% url 'signup' %}" class="btn">Sign up</a>
+
+  <form method="post"
+        action="{% url 'signup' %}"   <!-- ensure correct named route -->
+        enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <!-- SUBMIT the form (do NOT use <a>) -->
+    <button type="submit" class="btn">Sign up</button>
   </form>
 </div>
 {% endblock %}
+
