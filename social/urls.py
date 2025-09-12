@@ -17,4 +17,7 @@ urlpatterns = [
     path('post/<int:pk>/<str:action>/', views.post_react, name='post-react'),
     path('post/<int:pk>/share/', views.post_share, name='post-share'),
     path('post/<int:pk>/reply/', views.post_reply, name='post-reply'),
+    path('users/', views.users_list, name='users'),
+    path('explore/', views.posts_explore, name='explore'),
+
 ]

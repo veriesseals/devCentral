@@ -497,3 +497,78 @@ textarea {
 .profile-edit-form {
    margin-top:1rem; 
 }
+
+/* === Step 4: Nav should be buttons that match the app === */
+
+/* Turn header nav links + logout into pill buttons */
+.dc-header nav a,
+.dc-header .inline-logout button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  text-decoration: none;
+  color: #fff;                                 /* invert on teal header */
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background .2s ease, transform .12s ease, box-shadow .2s ease;
+  line-height: 1;
+}
+
+/* Hover / focus */
+.dc-header nav a:hover,
+.dc-header nav a:focus-visible,
+.dc-header .inline-logout button:hover,
+.dc-header .inline-logout button:focus-visible {
+  background: rgba(255,255,255,0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Active */
+.dc-header nav a:active,
+.dc-header .inline-logout button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+}
+
+/* Remove old underline-on-hover from inline logout since it's now a button */
+.inline-logout button:hover {
+  text-decoration: none;
+}
+
+/* Optional: if a link already has .btn, unify its size in the header */
+.dc-header nav .btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 9999px;
+}
+
+/* Utility if you prefer to opt-in via class instead of auto-styling */
+.btn-nav {
+  background: var(--teal);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, transform .12s ease, box-shadow .2s ease;
+}
+.btn-nav:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,.15); }
+.btn-nav:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+
+/* Small variant (matches your other small buttons) */
+.btn.btn-small,
+.dc-header nav .btn.btn-small {
+  height: 32px;
+  padding: 0 12px;
+  font-size: .875rem;
+}

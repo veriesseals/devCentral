@@ -7,7 +7,7 @@
   <h2>Create your DevCentral account</h2>
 
   <form method="post"
-        action="{% url 'signup' %}"   <!-- ensure correct named route -->
+        action="{% url 'social:signup' %}"   <!-- ensure correct named route -->
         enctype="multipart/form-data">
     {% csrf_token %}
 

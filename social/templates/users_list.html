@@ -1,0 +1,44 @@
+{% extends 'base.html' %}{% load static %}
+{% block content %}
+
+<h2>All Members</h2>
+
+<div class="members-panel">
+  {% for u in users %}
+    <div class="member-card">
+      <a class="member" href="{% url 'social:profile' u.username %}">
+        <img
+          class="avatar"
+          src="{% if u.profile.avatar %}{{ u.profile.avatar.url }}{% else %}{% static 'img/avatar-default.png' %}{% endif %}"
+          alt="{{ u.username }}"
+        >
+        <div class="meta">
+          <div class="name">@{{ u.username }}</div>
+          {% if u.profile.bio %}
+            <div class="muted">{{ u.profile.bio|truncatechars:60 }}</div>
+          {% endif %}
+        </div>
+      </a>
+
+      {% if request.user.is_authenticated and request.user != u %}
+        {% if request.user in u.profile.followers.all %}
+          <form action="{% url 'social:unfollow' u.username %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-unfollow">Unfollow</button>
+          </form>
+        {% else %}
+          <form action="{% url 'social:follow' u.username %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-follow">Follow</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>No users yet.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

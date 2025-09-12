@@ -1,0 +1,42 @@
+<aside class="members-box">
+  <h3 class="members-title">Members</h3>
+
+  <ul class="members-list">
+    {% for m in all_users %}
+      <li class="member-item">
+        <a href="{% url 'social:profile' m.username %}" class="member-link">
+          <span class="avatar sm">
+            {% if m.profile.avatar %}
+              <img src="{{ m.profile.avatar.url }}" alt="{{ m.username }}">
+            {% else %}
+              <img src="{% static 'img/avatar-default.png' %}" alt="{{ m.username }}">
+            {% endif %}
+          </span>
+          <span class="member-name">@{{ m.username }}</span>
+        </a>
+
+        {% if user.is_authenticated and user != m %}
+          {% if user in m.profile.followers.all %}
+            <form action="{% url 'social:unfollow' m.username %}" method="post" class="member-action">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="btn btn-sm btn-unfollow">Unfollow</button>
+            </form>
+          {% else %}
+            <form action="{% url 'social:follow' m.username %}" method="post" class="member-action">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="btn btn-sm btn-follow">Follow</button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="member-item empty">No other members yet.</li>
+    {% endfor %}
+  </ul>
+
+  <div class="members-footer">
+    <a href="{% url 'social:users' %}">View all →</a>
+  </div>
+</aside>

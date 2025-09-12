@@ -24,6 +24,8 @@
       <nav>
         {% if user.is_authenticated %}
           <a class="nav-pill" href="{% url 'social:feed' %}">HOME FEED</a>
+          <a class="nav-pill" href="{% url 'social:explore' %}">Explore</a>
+          <a class="nav-pill" href="{% url 'social:users' %}">Users</a>
           <a class="nav-pill" href="{% url 'social:profile' user.username %}">@{{ user.username }}</a>
 
           <form action="{% url 'logout' %}" method="post" class="inline-logout">

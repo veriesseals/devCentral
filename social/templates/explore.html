@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Explore — All posts</h2>
+
+{% if posts %}
+  {% for post in posts %}
+  <article class="post-card">
+    <div class="avatar">
+      {% if post.author.profile.avatar %}
+        <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
+      {% else %}
+        <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
+      {% endif %}
+    </div>
+
+    <div class="content">
+      <div class="meta">
+        <a class="username" href="{% url 'social:profile' post.author.username %}">@{{ post.author.username }}</a>
+        <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
+
+        {% if user.is_authenticated and user != post.author %}
+          {% if user in post.author.profile.followers.all %}
+            <form action="{% url 'social:unfollow' post.author.username %}" method="post" class="inline-form">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="btn-unfollow">Unfollow</button>
+            </form>
+          {% else %}
+            <form action="{% url 'social:follow' post.author.username %}" method="post" class="inline-form">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="btn-follow">Follow</button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="post-body markdown-output">
+        {{ post.rendered_html|safe }}
+      </div>
+
+      {% if post.image %}
+        <img class="post-image" src="{{ post.image.url }}" alt="post image">
+      {% endif %}
+
+      <div class="actions">
+        <form action="{% url 'social:post-react' post.id 'like' %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-like">👍 {{ post.likes_count }}</button>
+        </form>
+
+        <form action="{% url 'social:post-react' post.id 'dislike' %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-dislike">👎 {{ post.dislikes_count }}</button>
+        </form>
+
+        <form action="{% url 'social:post-share' post.id %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
+        </form>
+
+        {% if user.is_authenticated and user == post.author %}
+          <a class="btn btn-small" href="{% url 'social:post-edit' post.id %}">Edit</a>
+          <form action="{% url 'social:post-delete' post.id %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Delete this post?');">
+              Delete
+            </button>
+          </form>
+        {% endif %}
+      </div>
+
+      <details class="replies">
+        <summary>Replies ({{ post.replies.count }})</summary>
+        <ul>
+          {% for r in post.replies.all %}
+            <li>
+              <strong>@{{ r.author.username }}</strong>
+              {{ r.body }}
+              <em>{{ r.created_at|date:"M d H:i" }}</em>
+            </li>
+          {% empty %}
+            <li>No replies yet.</li>
+          {% endfor %}
+        </ul>
+
+        {% if user.is_authenticated %}
+          <form action="{% url 'social:post-reply' post.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <textarea name="body" rows="3" placeholder="Write a reply…" required
+                      style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;"></textarea>
+            <div style="margin-top:8px;">
+              <button class="btn" type="submit">Reply</button>
+            </div>
+          </form>
+        {% endif %}
+      </details>
+    </div>
+  </article>
+  {% endfor %}
+{% else %}
+  <p>No posts yet.</p>
+{% endif %}
+
+<nav class="pagination" style="margin-top:16px;">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Newer</a>
+  {% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Older →</a>
+  {% endif %}
+</nav>
+{% endblock %}
+
