@@ -1,5 +1,4 @@
 {% load static %}
-{# Renders a single post. Shared by feed.html and profile.html #}
 <article class="post-card">
   <div class="avatar">
     {% if post.author.profile.avatar %}
@@ -11,14 +10,18 @@
 
   <div class="content">
     <div class="meta">
-      <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
+      {% with uname=post.author.username %}
+        {% if uname %}
+          <a class="username" href="{% url 'social:profile' uname %}">@{{ uname }}</a>
+        {% else %}
+          <span class="username">@unknown</span>
+        {% endif %}
+      {% endwith %}
       <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
     </div>
 
     {% if post.rendered_html %}
-      <div class="post-body markdown-output">
-        {{ post.rendered_html|safe }}
-      </div>
+      <div class="post-body markdown-output">{{ post.rendered_html|safe }}</div>
     {% else %}
       <div class="post-body" data-post-body>{{ post.body }}</div>
     {% endif %}
@@ -27,40 +30,55 @@
       <img class="post-image" src="{{ post.image.url }}" alt="post image">
     {% endif %}
 
-    <div class="actions">
-      <form action="{% url 'post-react' post.id 'like' %}" method="post" class="inline-form">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn-like">👍 {{ post.likes_count }}</button>
-      </form>
+    {# Only show action forms when we have a real PK #}
+    {% with pk=post.pk %}
+      {% if pk %}
+        <div class="actions">
+          <form action="{% url 'social:post-react' pk 'like' %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-like">👍 {{ post.likes_count }}</button>
+          </form>
 
-      <form action="{% url 'post-react' post.id 'dislike' %}" method="post" class="inline-form">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn-dislike">👎 {{ post.dislikes_count }}</button>
-      </form>
+          <form action="{% url 'social:post-react' pk 'dislike' %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-dislike">👎 {{ post.dislikes_count }}</button>
+          </form>
 
-      <form action="{% url 'post-share' post.id %}" method="post" class="inline-form">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
-      </form>
-    </div>
+          <form action="{% url 'social:post-share' pk %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
+          </form>
+        </div>
 
-    <details class="replies">
-      <summary>Replies ({{ post.replies.count }})</summary>
-      <ul>
-        {% for r in post.replies.all %}
-          <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
-        {% empty %}
-          <li>No replies yet.</li>
-        {% endfor %}
-      </ul>
-      <form action="{% url 'post-reply' post.id %}" method="post">
-        {% csrf_token %}
-        {{ reply_form.body }}
-        <button class="btn" type="submit">Reply</button>
-      </form>
-    </details>
+        <details class="replies">
+          <summary>Replies ({{ post.replies.count }})</summary>
+          <ul>
+            {% for r in post.replies.all %}
+              <li><strong>@{{ r.author.username }}</strong> {{ r.body }} <em>{{ r.created_at|date:"M d H:i" }}</em></li>
+            {% empty %}
+              <li>No replies yet.</li>
+            {% endfor %}
+          </ul>
+          {% if user.is_authenticated %}
+            <form action="{% url 'social:post-reply' pk %}" method="post">
+              {% csrf_token %}
+              {{ reply_form.body }}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button class="btn" type="submit">Reply</button>
+            </form>
+          {% endif %}
+        </details>
+      {% else %}
+        {# Fallback UI for items without a PK (e.g., unsaved/foreign objects) #}
+        <div class="actions">
+          <button class="btn-like" disabled title="Unavailable">👍 {{ post.likes_count }}</button>
+          <button class="btn-dislike" disabled title="Unavailable">👎 {{ post.dislikes_count }}</button>
+          <button class="btn-share" disabled title="Unavailable">🔁 {{ post.shares_count }}</button>
+        </div>
+      {% endif %}
+    {% endwith %}
   </div>
 </article>

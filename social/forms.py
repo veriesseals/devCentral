@@ -74,3 +74,10 @@ class ReplyForm(forms.ModelForm):
         model = Reply; fields = ('body',)
         widgets = {'body': forms.Textarea(attrs={'rows':2,'placeholder':'Write a reply…'})}
 
+# Account deletion form
+# -----------------------------------------------
+class AccountDeleteForm(forms.Form):
+    password = forms.CharField(
+        label="Confirm your password",
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'})
+    )

@@ -3,7 +3,7 @@
 {% block content %}
 
 <section class="compose-card">
-  <form action="{% url 'post-create' %}" method="post" enctype="multipart/form-data">
+  <form action="{% url 'social:post-create' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ post_form.body }}
     <div class="row">
@@ -26,18 +26,18 @@
 
     <div class="content">
       <div class="meta">
-        <a class="username" href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a>
+        <a class="username" href="{% url 'social:profile' post.author.username %}">@{{ post.author.username }}</a>
         <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
 
         {# Follow / Unfollow (POST) #}
         {% if user.is_authenticated and user != post.author %}
           {% if user in post.author.profile.followers.all %}
-            <form action="{% url 'unfollow' post.author.username %}" method="post" style="display:inline;">
+            <form action="{% url 'social:unfollow' post.author.username %}" method="post" style="display:inline;">
               {% csrf_token %}
               <button type="submit" class="btn-unfollow">Unfollow</button>
             </form>
           {% else %}
-            <form action="{% url 'follow' post.author.username %}" method="post" style="display:inline;">
+            <form action="{% url 'social:follow' post.author.username %}" method="post" style="display:inline;">
               {% csrf_token %}
               <button type="submit" class="btn-follow">Follow</button>
             </form>
@@ -45,8 +45,7 @@
         {% endif %}
       </div>
 
-      {# Body (plain and rendered markdown with code highlighting) #}
-      
+      {# Body (rendered HTML) #}
       <div class="post-body markdown-output">
         {{ post.rendered_html|safe }}
       </div>
@@ -57,19 +56,19 @@
 
       {# Reactions (POST). Keep these INSIDE the loop so post.id exists. #}
       <div class="actions">
-        <form action="{% url 'post-react' post.id 'like' %}" method="post" style="display:inline;">
+        <form action="{% url 'social:post-react' post.id 'like' %}" method="post" style="display:inline;">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
           <button type="submit" class="btn-like">👍 {{ post.likes_count }}</button>
         </form>
 
-        <form action="{% url 'post-react' post.id 'dislike' %}" method="post" style="display:inline;">
+        <form action="{% url 'social:post-react' post.id 'dislike' %}" method="post" style="display:inline;">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
           <button type="submit" class="btn-dislike">👎 {{ post.dislikes_count }}</button>
         </form>
 
-        <form action="{% url 'post-share' post.id %}" method="post" style="display:inline;">
+        <form action="{% url 'social:post-share' post.id %}" method="post" style="display:inline;">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
           <button type="submit" class="btn-share">🔁 {{ post.shares_count }}</button>
@@ -77,8 +76,8 @@
 
         {# Edit / Delete (owner-only) #}
         {% if user.is_authenticated and user == post.author %}
-          <a class="btn btn-small" href="{% url 'post-edit' post.id %}">Edit</a>
-          <form action="{% url 'post-delete' post.id %}" method="post" style="display:inline;">
+          <a class="btn btn-small" href="{% url 'social:post-edit' post.id %}">Edit</a>
+          <form action="{% url 'social:post-delete' post.id %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-small"
                     onclick="return confirm('Delete this post?');">Delete</button>
@@ -102,7 +101,7 @@
         </ul>
 
         {% if user.is_authenticated %}
-          <form action="{% url 'post-reply' post.id %}" method="post">
+          <form action="{% url 'social:post-reply' post.id %}" method="post">
             {% csrf_token %}
             {{ reply_form.body }}
             <button class="btn" type="submit">Reply</button>

@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -24,6 +24,14 @@ from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.shortcuts import render
 
 from .models import Post  # ensure Post is imported
+
+from .models import Follow  # ensure this import exists
+from .forms import AccountDeleteForm
+
+from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_POST      # ← ADD THIS
+
+User = get_user_model()
 
 # signup view
 # -----------------------------------------------
@@ -236,6 +244,7 @@ def profile_view(request, username):
         if form.is_valid(): form.save(); return redirect('profile', username=u.username)
     return render(request, 'profile.html', {'profile_user': u, 'is_following': is_following, 'posts': posts, 'form': form})
 
+
 # follow/unfollow shortcuts
 # -----------------------------------------------
 @login_required
@@ -255,3 +264,76 @@ def unfollow(request, username):
     if target != request.user:
         target.profile.followers.remove(request.user)
     return redirect('profile', username=username)
+
+def feed(request):
+    """
+    Home feed:
+      - If logged in: show your posts + posts of people you follow
+      - If logged out: show all posts or a landing page
+    """
+    from .models import Post  # only if you have Post in this app
+    posts = Post.objects.all()
+    if request.user.is_authenticated:
+        following_ids = Follow.objects.filter(
+            follower=request.user
+        ).values_list('following_id', flat=True)
+        posts = Post.objects.filter(Q(author__in=following_ids) | Q(author=request.user)).order_by('-created_at')
+    return render(request, 'social/feed.html', {'posts': posts})
+
+def profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    is_self = (request.user.is_authenticated and request.user.pk == profile_user.pk)
+    is_following = False
+    if request.user.is_authenticated and not is_self:
+        is_following = Follow.objects.filter(follower=request.user, following=profile_user).exists()
+
+    follower_count = Follow.objects.filter(following=profile_user).count()
+    following_count = Follow.objects.filter(follower=profile_user).count()
+
+    return render(request, 'social/profile.html', {
+        'profile_user': profile_user,
+        'is_self': is_self,
+        'is_following': is_following,
+        'follower_count': follower_count,
+        'following_count': following_count,
+    })
+
+@require_POST
+@login_required
+def follow(request, username):
+    target = get_object_or_404(User, username=username)
+    if target != request.user:
+        Follow.objects.get_or_create(follower=request.user, following=target)
+        messages.success(request, f"You’re now following @{target.username}.")
+    return redirect('social:profile', username=target.username)
+
+@require_POST
+@login_required
+def unfollow(request, username):
+    target = get_object_or_404(User, username=username)
+    if target != request.user:
+        Follow.objects.filter(follower=request.user, following=target).delete()
+        messages.success(request, f"You unfollowed @{target.username}.")
+    return redirect('social:profile', username=target.username)
+
+@login_required
+def account_delete(request):
+    """
+    Delete the current user after password confirmation.
+    """
+    if request.method == 'POST':
+        form = AccountDeleteForm(request.POST)
+        if form.is_valid():
+            pwd = form.cleaned_data['password']
+            if request.user.check_password(pwd):
+                username = request.user.username
+                request.user.delete()
+                messages.success(request, f"Account @{username} deleted.")
+                # logged-out automatically when user row is gone; ensure session cleared
+                logout(request)
+                return redirect('login')
+            else:
+                messages.error(request, "Password incorrect. Please try again.")
+    else:
+        form = AccountDeleteForm()
+    return render(request, 'social/account_delete.html', {'form': form})

@@ -16,25 +16,42 @@
 <p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
 <p>{{ profile_user.profile.bio }}</p>
 
+<p class="follow-stats">
+  <strong>{{ profile_user.profile.followers.count }}</strong> Followers
+  &nbsp;·&nbsp;
+  <strong>
+    {% if profile_user.profile.following %}
+      {{ profile_user.profile.following.count }}
+    {% else %}
+      0
+    {% endif %}
+  </strong> Following
+</p>
+
 {% if user.is_authenticated and user != profile_user %}
   {% if user in profile_user.profile.followers.all %}
-    <form action="{% url 'unfollow' profile_user.username %}" method="post" class="inline-form">
+    <form action="{% url 'social:unfollow' profile_user.username %}" method="post" class="inline-form">
       {% csrf_token %}
-      <button type="submit" class="btn-unfollow">Unfollow</button>
+      <button type="submit" class="btn btn-unfollow">Unfollow</button>
     </form>
   {% else %}
-    <form action="{% url 'follow' profile_user.username %}" method="post" class="inline-form">
+    <form action="{% url 'social:follow' profile_user.username %}" method="post" class="inline-form">
       {% csrf_token %}
-      <button type="submit" class="btn-follow">Follow</button>
+      <button type="submit" class="btn btn-follow">Follow</button>
     </form>
   {% endif %}
 {% endif %}
 
 {% if user.is_authenticated and user == profile_user %}
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" class="profile-edit-form">
     {% csrf_token %}
     {{ form.as_p }}
     <button class="btn" type="submit">Update Profile</button>
+  </form>
+
+  <form method="post" action="{% url 'social:account_delete' %}" class="danger-zone" style="margin-top:1rem">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete Account</button>
   </form>
 {% endif %}
 
@@ -42,7 +59,8 @@
 <h3>Posts</h3>
 
 {% for post in posts %}
-  {% include "social/_post_item.html" with post=post %}
+  {# This pulls in the post UI; needs reply_form in the context #}
+  {% include "social/_post_item.html" with post=post reply_form=reply_form %}
 {% empty %}
   <p>No posts yet.</p>
 {% endfor %}

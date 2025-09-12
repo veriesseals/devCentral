@@ -474,3 +474,26 @@ textarea {
     text-decoration: none;
     padding: 0;
 }
+
+/* Follow button */
+.btn {
+   display:inline-block; 
+   padding:.5rem .85rem; 
+   border-radius:.75rem; 
+   text-decoration:none; 
+}
+
+.btn-danger {
+   background:#b00020; color:#fff; 
+
+}
+.inline-form {
+   display:inline; margin-left:.5rem; 
+}
+
+.follow-stats {
+   margin:.25rem 0 .75rem; opacity:.8; 
+}
+.profile-edit-form {
+   margin-top:1rem; 
+}

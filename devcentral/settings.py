@@ -122,7 +122,7 @@ STATICFILES_DIRS = [BASE_DIR / 'social' / 'static']  # app-level static
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_REDIRECT_URL = 'feed'
+LOGIN_REDIRECT_URL = 'social:feed'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Default primary key field type

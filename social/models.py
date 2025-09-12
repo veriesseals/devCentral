@@ -2,6 +2,9 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+
+# If you have a custom user model, use settings.AUTH_USER_MODEL
+# -----------------------------------------------
 User = settings.AUTH_USER_MODEL
 
 # Helper functions for upload paths
@@ -96,4 +99,18 @@ class CodeSnippet(models.Model):
 
     def __str__(self):
         return self.title or f"{self.author.username} • {self.language}"
+    
+    
+# Follow model to manage user follows
+# -----------------------------------------------
+class Follow(models.Model):
+    follower  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_set')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers_set')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('follower', 'following')
+
+    def __str__(self):
+        return f"{self.follower} → {self.following}"
 
