@@ -1,21 +1,18 @@
-{% extends 'base.html' %}{% load static %}
-{% block content %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block auth_content %}
 <div class="auth-page">
   <div class="logo-large">
     <img src="{% static 'img/devcentral-logo-placeholder.svg' %}" alt="DevCentral logo">
   </div>
-  <h2>Create your DevCentral account</h2>
 
-  <form method="post"
-        action="{% url 'social:signup' %}"   <!-- ensure correct named route -->
-        enctype="multipart/form-data">
+  <h2>Create your Tru devCentral account</h2>
+
+  <form method="post" action="{% url 'social:signup' %}" enctype="multipart/form-data">
     {% csrf_token %}
-
     {{ form.as_p }}
-
-    <!-- SUBMIT the form (do NOT use <a>) -->
     <button type="submit" class="btn">Sign up</button>
   </form>
 </div>
 {% endblock %}
-

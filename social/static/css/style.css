@@ -1,574 +1,386 @@
+/* =========================
+   Theme tokens
+   ========================= */
 :root{
-  --teal:#10b4b4;
-  --teal-dark:#0b8d8d;
-  --bg:#fff;
-  --text:#0f172a;
-  --muted:#6b7280;
-  --card:#f6ffff
-  
+  /* Brand */
+  --brand:#14b8a6;          /* teal-500 */
+  --brand-600:#0d9488;      /* teal-600 */
+  --brand-700:#0f766e;      /* teal-700 */
+
+  /* Surface & text */
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;           /* slate-900 */
+  --muted:#64748b;          /* slate-500 */
+  --line:#e2e8f0;           /* slate-200 */
+
+  /* Accents */
+  --pill:#ccfbf1;           /* teal-100 */
+  --pill-200:#a7f3d0;       /* teal-200 */
+
+  /* Layout */
+  --wrap-max:1180px;
+  --rail-left:260px;
+  --rail-right:320px;
+  --gap:20px;
+
+  /* Misc */
+  --radius:16px;
+  --shadow:0 6px 24px rgba(15,23,42,.06);
 }
 
-* {
-  box-sizing:border-box
-}
-
-html, body {
-   height: 100%;
-}
-
-body {
+/* =========================
+   Resets / base
+   ========================= */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+html,body{ overflow-x:hidden; background:var(--bg); }
+body{
   margin:0;
-  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;
   color:var(--text);
-  background:var(--bg);
-  min-height: 100svh;           /* support mobile safe viewport units */
-  display: flex;
-  flex-direction: column;
-}
-
-.wrap {
-  width:min(1100px,95%);
-  margin-inline:auto
-}
-.dc-header {
-  background:var(--teal);
-  color:#fff;
-  flex: 0 0 auto;
-}
-/* Header layout + vertical centering */
-.dc-header .wrap{
+  font:16px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+  min-height:100svh;
   display:flex;
-  align-items:center;              /* centers logo/text vertically */
-  justify-content:space-between;
+  flex-direction:column;
 }
+img,video{ max-width:100%; height:auto; display:block; }
 
-.dc-header nav{
-  display:flex;
-  align-items:center;
-  gap:12px;                        /* space between pills */
-}
-
-/* Unified “pill” style for links & the logout button */
-.dc-header .nav-pill{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:40px;                     /* consistent hit-area */
-  padding:0 14px;
-  border-radius:9999px;
-  text-decoration:none;
-  color:#fff;
-  background:transparent;
-  border:0;
-  cursor:pointer;
-  transition:background .2s ease, transform .12s ease;
-  line-height:1;                   /* avoids off-center text on hover */
-}
-
-/* Hover/focus effect (rollover) */
-.dc-header .nav-pill:hover,
-.dc-header .nav-pill:focus-visible{
-  background:rgba(255,255,255,.16);
-  transform:translateY(-1px);
-}
-
-/* Active/click */
-.dc-header .nav-pill:active{
-  transform:translateY(0);
-}
-
-/* Make the logout button look like the links */
-.dc-header .btn-logout{
-  font:inherit;                    /* match header font */
-  color:#fff;
-  background:transparent;
-}
-
-/* If you had old button/link rules that fight these, keep this stronger selector */
-.dc-header nav a.btn,
-.dc-header nav a,
-.dc-header .inline-logout .btn{
-  box-shadow:none;                 /* optional: keep pills flat */
-}
-
-/* Your <main> block should expand to fill available space */
-main { 
-  flex: 1 0 auto;
-  min-height: 0;                /* prevents overflow issues in some browsers */
-}
-
-.brand {
-  display:flex;
-  gap:12px;
-  align-items:center
-}
-.brand .logo {
-  width:100px;
-  height:auto;
-}
-.dc-header a {
-  color:#fff;
-  margin-left:16px;
-  text-decoration:none
-}
-:root {
-  --teal: #14b8a6;
-  --teal-dark: #0d9488;
-}
-
-/* Shared button style */
-:root {
-  --teal: #14b8a6;
-  --teal-dark: #0d9488;
-}
-
-/* Shared button style */
-.btn {
-  background: var(--teal);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-}
-
-/* Hover/rollover */
-.btn:hover {
-  background: var(--teal-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Active/click */
-.btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Follow button */
-.btn-follow {
-  background: var(--teal);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-}
-.btn-follow:hover {
-  background: var(--teal-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Unfollow button */
-.btn-unfollow {
-  background: #e11d48; /* red */
-  color: white;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-}
-.btn-unfollow:hover {
-  background: #be123c; /* darker red */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Subtle ghost button (for Edit) */
-.btn-ghost {
-  background: transparent;
-  color: var(--teal);
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 2px solid var(--teal);
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-}
-.btn-ghost:hover {
-  background: var(--teal);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Danger button (Delete) */
-.btn-danger {
-  background: #e11d48; /* red */
-  color: white;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-}
-.btn-danger:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-
-/* Optional secondary */
-.btn-secondary {
-  background: #e2e8f0;
-  color: #0f172a;
-}
-.post-actions { float: right; display: inline-flex; gap: 8px; }
-
-
-
-.compose-card,
-.post-card {
-  background:var(--card);
-  border:1px solid #d1eeee;
-  border-radius:16px;
-  padding:12px;
-  margin:14px 0
-}
-.compose-card .row {
-  display:flex;
-  gap:12px;
-  align-items:center;
-  margin-top:8px
-}
-textarea {
-  width:100%;
-  padding:10px;
-  border:1px solid #cbd5e1;
-  border-radius:10px
-  }
-
-.post-card {
-  display:flex;
-  gap:14px
-}
-.avatar {
-  width:48px;
-  height:48px;
-  border-radius:999px;
-  overflow:hidden;
-  flex:0 0 auto;
-  border:2px solid var(--teal)
-}
-.avatar img {
-  width:100%;
-  height:100%;
-  object-fit:cover
-}
-.avatar.lg {
-  width:120px;
-  height:120px;
-  border:4px solid var(--teal)
-}
-.content {
-  flex:1
-}
-.meta {
-  display:flex;
-  gap:12px;
-  align-items:center;
-  font-size:14px;
-  color:var(--muted)
-}
-.username {
-  color:var(--teal-dark);
-  font-weight:700;
-  text-decoration:none
-}
-.post-image {
-  margin-top:8px;
-  max-width:100%;
-  border-radius:12px
-}
-.actions a {
-  margin-right:14px;
-  text-decoration:none;
-  color:var(--teal-dark);
-  font-weight:600
-}
-.replies summary {
-  cursor:pointer;
-  color:var(--teal-dark);
-  margin-top:6px;
-  font-weight:600
-}
-
-.dc-footer {
-  border-top: 1px solid #e2e8f0;
-  background: var(--teal);
-  color: white;
-  flex: 0 0 auto;
-  margin-top: auto;
-  /* keep it a normal flow element (not fixed/absolute) */
-  position: static;
-  width: 100%;
-  /* optional: safe area padding for iOS devices with a home indicator */
-  padding-bottom: calc(var(--footer-padding-bottom, 0px) + env(safe-area-inset-bottom));
-}
-
-.dc-footer .wrap {
-  padding: 10px 0;
+/* Logo */
+.logo-large {
+  margin-bottom: 20px;
   display: flex;
   justify-content: center;   /* ✅ center horizontally */
-  align-items: center;       /* ✅ center vertically */
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
-.auth-page {
-  max-width:500px;
-  margin:40px auto;
-  text-align:center
-}
-.logo-large {
-  margin-bottom:20px
-}
 .logo-large img {
-  width:40%;
-  max-width:50%;
-  height:auto
-}
-
-@media (max-width:700px) {
-  .dc-header .wrap {
-    flex-direction:column;
-    gap:8px;
-    align-items:flex-start
-  }
-}
-
-/* Default button */
-:root {
-  --teal: #14b8a6;
-  --teal-dark: #0d9488;
+  width: 150px;              /* ✅ larger size */
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 
-.inline-logout {
-  display: inline;
+
+/* Containers */
+.wrap {
+   width:clamp(320px,94vw,var(--wrap-max));
+    margin:0 auto;
+     padding:0 16px; 
+}
+
+main {
+    flex: 1 0 auto;
+    min-height: 0;
+} /* avoid weird overflow in some browsers */
+
+/* =========================
+   Header / navigation
+   ========================= */
+.dc-header{
+  background:var(--brand);
+  color:#fff;
+  position:sticky; top:0; z-index:20;
+  border-bottom:1px solid rgba(255,255,255,.18);
+}
+.dc-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.head-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand .logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.brand h1 {
+  font-size: 18px;
   margin: 0;
-  padding: 0;
+  color: #fff;
 }
 
-.inline-logout button {
-  background: none;
-  border: none;
-  color: white;          /* match your nav link color */
-  cursor: pointer;
-  font: inherit;
+.main-nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nav-pill,
+.inline-logout button{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:36px; padding:0 14px; border-radius:9999px;
+  background:rgba(255,255,255,0.14);
+  color:#fff; text-decoration:none; border:1px solid rgba(255,255,255,0.22);
+  cursor:pointer; font-weight:600;
+  transition:background .2s ease, transform .12s ease, box-shadow .2s ease;
+  line-height:1;
+}
+
+.nav-pill:hover,
+.inline-logout button:hover{
+  background:rgba(255,255,255,0.22); transform:translateY(-1px); box-shadow:0 4px 8px rgba(0,0,0,.12); 
+}
+
+.inline-logout{
+  display:inline-flex; margin:0; 
+}
+
+.inline-logout button{
+  background:none; 
+}
+
+/* =========================
+   App shell (authenticated)
+   NOTE: uses .app-shell to match base.html
+   ========================= */
+
+   /* App shell: default to 2 columns (center + right) */
+   .app-shell {
+     display:grid;
+     grid-template-columns: minmax(0,1fr) var(--rail-right); /* ⬅ was 3 cols */
+     gap:var(--gap);
+     align-items:start;
+     width:clamp(320px,94vw,var(--wrap-max));
+  margin:16px auto 0;
+  padding:0 16px;
+}
+
+.rail {
+   position: sticky;
+   top: 76px;
+   padding: 12px;
+   height: max-content;
+}
+.rail, .center > .card, .rail .card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* Left rail exists in DOM but collapsed; doesn't reserve space */
+.rail-left {
+  display: none;
+  width: var(--rail-left);
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
   text-decoration: none;
-  padding: 0 0 0 16px;   /* same spacing as links */
+}
+.menu-link:hover, .menu-link.active {
+  background: var(--pill);
 }
 
-.inline-logout button:hover {
-  text-decoration: underline;
+/* Right rail is visible on desktop; hidden on tablet/mobile below */
+.rail-right {
+  display: block;
 }
 
-/* Password Visibility Toggle */
-
-/* ==== Password toggle ==== */
-/* Password field wrapper */
-.pw-field {
-  position: relative;
-  display: inline-block;
-  width: auto;                /* ✅ don’t stretch full width */
+/* =========================
+   Buttons
+   ========================= */
+.btn{
+  background:var(--brand); color:#fff; border:none; border-radius:12px;
+  padding:10px 14px; cursor:pointer; font-weight:600;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:background .2s ease, transform .12s ease, box-shadow .2s ease;
 }
+.btn:hover{ background:var(--brand-600); transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.12); }
+.btn:active{ transform:translateY(0); box-shadow:0 2px 4px rgba(0,0,0,.16); }
 
-/* Make input same width as normal Django inputs */
-.pw-field input[type="password"],
-.pw-field input[type="text"] {
-  width: 220px;               /* ✅ match Username input width */
-  padding-right: 3rem;        /* room for the Show button */
-  box-sizing: border-box;
+.btn-small{ height:32px; padding:0 12px; font-size:.875rem; }
+.btn-ghost{ background:var(--pill); color:var(--brand-700); }
+.btn-ghost:hover{ background:var(--pill-200); }
+.btn-danger{ background:#e11d48; color:#fff; }
+.btn-danger:hover{ background:#be123c; }
+
+.btn-follow{ background:var(--brand); color:#fff; padding:6px 14px; border-radius:999px; }
+.btn-follow:hover{ background:var(--brand-600); }
+.btn-unfollow{ background:#e11d48; color:#fff; padding:6px 14px; border-radius:999px; }
+.btn-unfollow:hover{ background:#be123c; }
+
+.btn-nav{ background:var(--brand); color:#fff; padding:8px 16px; border-radius:999px; }
+.btn-nav:hover{ background:var(--brand-600); }
+
+/* Inline form helpers for tiny actions in lists */
+.inline-form{ display:inline; }
+.inline-form button{ background:none; border:none; color:var(--brand-600); cursor:pointer; font:inherit; padding:0; }
+
+/* =========================
+   Forms
+   ========================= */
+input[type="text"], input[type="email"], input[type="password"],
+textarea, select{
+  width:100%; padding:10px 12px; border:1px solid var(--line);
+  border-radius:12px; background:#fff; color:var(--text);
 }
+textarea{ resize:vertical; }
 
-
-.pw-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font: inherit;
-  color: var(--teal-dark);
-  padding: 4px 6px;
-  border-radius: 8px;
+/* Password visibility toggle */
+.pw-field{ position:relative; display:inline-block; width:auto; }
+.pw-field input[type="password"], .pw-field input[type="text"]{ width:220px; padding-right:3rem; box-sizing:border-box; }
+.pw-toggle{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  background:none; border:0; cursor:pointer; font:inherit; color:var(--brand-700);
+  padding:4px 6px; border-radius:8px;
 }
+.pw-toggle:hover, .pw-toggle:focus{ outline:none; background:#e8ffff; }
+.pw-toggle .eye{ display:inline-block; font-weight:700; }
 
-.pw-toggle:hover,
-.pw-toggle:focus {
-  outline: none;
-  background: #e8ffff;
+/* =========================
+   Feed / posts
+   ========================= */
+.compose-card, .post-card{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:16px; padding:12px; margin:14px 0;
 }
+.compose-card .row{ display:flex; gap:12px; align-items:center; margin-top:8px; }
 
-/* Optional: small icon look */
-.pw-toggle .eye {
-  display: inline-block;
-  font-weight: 700;
-}
+.post-card{ display:flex; gap:14px; }
+.avatar{ width:48px; height:48px; border-radius:999px; overflow:hidden; flex:0 0 auto; border:2px solid var(--brand); }
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+.avatar.lg{ width:120px; height:120px; border:4px solid var(--brand); }
 
-/* Code Block Styles */
-.post-card pre code,
-.snippet-card pre code {
+.content{ flex:1; }
+.meta{ display:flex; gap:12px; align-items:center; font-size:14px; color:var(--muted); }
+.username{ color:var(--brand-700); font-weight:700; text-decoration:none; }
+.post-body{ white-space:normal; }
+.post-image{ margin-top:8px; max-width:100%; border-radius:12px; }
+
+.actions a{ margin-right:14px; text-decoration:none; color:var(--brand-700); font-weight:600; }
+.replies summary{ cursor:pointer; color:var(--brand-700); margin-top:6px; font-weight:600; }
+
+/* Code blocks (Prism/Pygments) */
+.post-card pre, .snippet-card pre{ border-radius:10px; overflow:auto; margin:8px 0; }
+.post-card pre code, .snippet-card pre code{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size:.95rem; line-height:1.4;
 }
-.post-card pre,
-.snippet-card pre {
-  border-radius: 10px;
-  overflow: auto;
-  margin: 8px 0;
-}
+/* Minimal Pygments fallback */
+.codehilite{ background:#0f172a; color:#e5e7eb; padding:10px; border-radius:10px; overflow:auto; }
+.codehilite .k{ color:#93c5fd; }   /* keywords */
+.codehilite .s{ color:#fca5a5; }   /* strings  */
+.codehilite .c{ color:#9ca3af; }   /* comments */
 
-/* Style Code Blocks */
-.post-card pre code,
-.snippet-card pre code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-.post-card pre,
-.snippet-card pre {
-  border-radius: 10px;
-  overflow: auto;
-  margin: 8px 0;
-}
+/* =========================
+   Flash messages
+   ========================= */
+.flash{ position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px; z-index:50; }
+.flash-item{ background:#fff; border:1px solid var(--line); box-shadow:var(--shadow); padding:10px 12px; border-radius:12px; }
 
-/* CSS for Pygments */
-/* Minimal Pygments defaults */
-.codehilite {
-   background: #0f172a; 
-   color: #e5e7eb; 
-   padding: 10px; 
-   border-radius: 10px; 
-   overflow:auto; 
-}
-.codehilite .k {
-   color: #93c5fd; 
-}   /* keywords */
-.codehilite .s {
-   color: #fca5a5; 
-}   /* strings  */
-.codehilite .c {
-   color: #9ca3af; 
-}   /* comments */
-
-/* Add this at the end of your existing CSS file */
-.inline-form {
-    display: inline;
-}
-
-.inline-form button {
-    background: none;
-    border: none;
-    color: var(--teal-dark);  /* match your link color */
-    cursor: pointer;
-    font: inherit;
-    text-decoration: none;
-    padding: 0;
-}
-
-/* Follow button */
-.btn {
-   display:inline-block; 
-   padding:.5rem .85rem; 
-   border-radius:.75rem; 
-   text-decoration:none; 
-}
-
-.btn-danger {
-   background:#b00020; color:#fff; 
-
-}
-.inline-form {
-   display:inline; margin-left:.5rem; 
-}
-
-.follow-stats {
-   margin:.25rem 0 .75rem; opacity:.8; 
-}
-.profile-edit-form {
-   margin-top:1rem; 
-}
-
-/* === Step 4: Nav should be buttons that match the app === */
-
-/* Turn header nav links + logout into pill buttons */
-.dc-header nav a,
-.dc-header .inline-logout button {
+/* Ensure logout button matches nav-pill links */
+.inline-logout button.nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
+  height: 36px;
   padding: 0 14px;
   border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
   text-decoration: none;
-  color: #fff;                                 /* invert on teal header */
-  background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.22);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   cursor: pointer;
   font-weight: 600;
   transition: background .2s ease, transform .12s ease, box-shadow .2s ease;
   line-height: 1;
 }
 
-/* Hover / focus */
-.dc-header nav a:hover,
-.dc-header nav a:focus-visible,
-.dc-header .inline-logout button:hover,
-.dc-header .inline-logout button:focus-visible {
-  background: rgba(255,255,255,0.22);
+/* Hover / active state same as links */
+.inline-logout button.nav-pill:hover,
+.inline-logout button.nav-pill:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
 }
 
-/* Active */
-.dc-header nav a:active,
-.dc-header .inline-logout button:active {
+.inline-logout button.nav-pill:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 4px rgba(0,0,0,.18);
 }
 
-/* Remove old underline-on-hover from inline logout since it's now a button */
-.inline-logout button:hover {
-  text-decoration: none;
+
+
+/* =========================
+   Footer
+   ========================= */
+.dc-footer{
+  border-top:1px solid var(--line);
+  background:var(--brand);
+  color:#fff;
+  position:static; width:100%;
+  padding-bottom:calc(var(--footer-padding-bottom,0px) + env(safe-area-inset-bottom));
+}
+.dc-footer .wrap{
+  padding:10px 0;
+  display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap;
 }
 
-/* Optional: if a link already has .btn, unify its size in the header */
-.dc-header nav .btn {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 9999px;
+/* =========================
+   Auth pages (login/signup)
+   ========================= */
+.auth-shell{ max-width:520px; padding:24px 0; }
+.auth-page{
+  max-width:500px; margin:40px auto; text-align:center;
+  background:var(--card); border:1px solid var(--line); border-radius:16px; padding:32px 28px; box-shadow:var(--shadow);
 }
 
-/* Utility if you prefer to opt-in via class instead of auto-styling */
-.btn-nav {
-  background: var(--teal);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .2s ease, transform .12s ease, box-shadow .2s ease;
-}
-.btn-nav:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,.15); }
-.btn-nav:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,.2); }
 
-/* Small variant (matches your other small buttons) */
-.btn.btn-small,
-.dc-header nav .btn.btn-small {
-  height: 32px;
-  padding: 0 12px;
-  font-size: .875rem;
+/* =========================
+   Utilities
+   ========================= */
+.muted{ color:var(--muted); }
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width:1200px){
+  :root{ --rail-right:300px; }
+}
+
+/* Tablet: hide RIGHT rail, keep left + center (we don’t show left by design) */
+@media (max-width:1024px){
+  .app-shell{ grid-template-columns: minmax(0,1fr); }
+  .rail-right{ display:none; }
+}
+
+/* Mobile: center only */
+@media (max-width:768px){
+  .app-shell{ grid-template-columns: minmax(0,1fr); }
+  .rail-left{ display:none; }
+  .rail{ position:static; }
+  .main-nav{ gap:8px; }
+  .brand h1{ font-size:16px; }
+}
+
+@media (max-width:700px){
+  .dc-header .wrap{ flex-direction:column; gap:8px; align-items:flex-start; }
 }

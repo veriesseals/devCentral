@@ -1,67 +1,196 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block content %}
-<div class="profile">
-  <div class="avatar lg">
-    {% if profile_user.profile.avatar %}
-      <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
-    {% else %}
-      <img src="{% static 'img/avatar-default.png' %}" alt="avatar">
-    {% endif %}
+{# ============ LEFT RAIL ============ #}
+{% block left_rail %}
+  <div class="card">
+    <nav class="menu">
+      <a class="menu-link" href="{% url 'social:feed' %}">Feed</a>
+      <a class="menu-link" href="{% url 'social:explore' %}">Explore</a>
+      <a class="menu-link" href="{% url 'social:users' %}">Users</a>
+      <a class="menu-link active" href="{% url 'social:profile' profile_user.username %}">Profile</a>
+    </nav>
   </div>
-</div>
+{% endblock %}
 
-<h2>@{{ profile_user.username }}</h2>
-<p>{{ profile_user.first_name }} {{ profile_user.last_name }} • {{ profile_user.email }}</p>
-<p>{{ profile_user.profile.bio }}</p>
+{# ============ CENTER COLUMN ============ #}
+{% block content %}
+  <section class="card profile-header">
+    <div class="profile-header__row">
+      <div class="avatar xl">
+        {% if profile_user.profile.avatar %}
+          <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}" loading="lazy">
+        {% else %}
+          <img src="{% static 'img/avatar-default.png' %}" alt="avatar" loading="lazy">
+        {% endif %}
+      </div>
 
-<p class="follow-stats">
-  <strong>{{ profile_user.profile.followers.count }}</strong> Followers
-  &nbsp;·&nbsp;
-  <strong>
-    {% if profile_user.profile.following %}
-      {{ profile_user.profile.following.count }}
-    {% else %}
-      0
-    {% endif %}
-  </strong> Following
-</p>
+      <div class="profile-header__meta">
+        <h2 class="profile-username">@{{ profile_user.username }}</h2>
+        <p class="muted">
+          {{ profile_user.first_name }} {{ profile_user.last_name }}
+          {% if profile_user.email %} • {{ profile_user.email }}{% endif %}
+        </p>
+        {% if profile_user.profile.bio %}
+          <p class="profile-bio">{{ profile_user.profile.bio }}</p>
+        {% endif %}
 
-{% if user.is_authenticated and user != profile_user %}
-  {% if user in profile_user.profile.followers.all %}
-    <form action="{% url 'social:unfollow' profile_user.username %}" method="post" class="inline-form">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-unfollow">Unfollow</button>
-    </form>
-  {% else %}
-    <form action="{% url 'social:follow' profile_user.username %}" method="post" class="inline-form">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-follow">Follow</button>
-    </form>
+        <p class="follow-stats">
+          <strong>{{ profile_user.profile.followers.count }}</strong> Followers
+          &nbsp;·&nbsp;
+          <strong>
+            {% if profile_user.profile.following %}
+              {{ profile_user.profile.following.count }}
+            {% else %}0{% endif %}
+          </strong> Following
+        </p>
+
+        <div class="row gap-8">
+          {% if user.is_authenticated and user != profile_user %}
+            {% if user in profile_user.profile.followers.all %}
+              <form action="{% url 'social:unfollow' profile_user.username %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">Unfollow</button>
+              </form>
+            {% else %}
+              <form action="{% url 'social:follow' profile_user.username %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">Follow</button>
+              </form>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if user.is_authenticated and user == profile_user %}
+    <section class="card">
+      <h3>Edit profile</h3>
+      <form method="post" enctype="multipart/form-data" class="stack gap-12">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="row end">
+          <button class="btn" type="submit">Update Profile</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card danger-zone">
+      <h3>Danger zone</h3>
+      <form method="post" action="{% url 'social:account_delete' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete Account</button>
+      </form>
+    </section>
   {% endif %}
-{% endif %}
 
-{% if user.is_authenticated and user == profile_user %}
-  <form method="post" enctype="multipart/form-data" class="profile-edit-form">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn" type="submit">Update Profile</button>
-  </form>
+  <section class="card">
+    <h3>Posts</h3>
 
-  <form method="post" action="{% url 'social:account_delete' %}" class="danger-zone" style="margin-top:1rem">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete Account</button>
-  </form>
-{% endif %}
+    {% if posts %}
+      {% for post in posts %}
+        <article id="post-{{ post.id }}" class="post-card">
+          <div class="post-head">
+            <div class="avatar">
+              {% if post.author.profile.avatar %}
+                <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}" loading="lazy">
+              {% else %}
+                <img src="{% static 'img/avatar-default.png' %}" alt="avatar" loading="lazy">
+              {% endif %}
+            </div>
 
-<hr>
-<h3>Posts</h3>
+            <div class="meta">
+              <a class="username" href="{% url 'social:profile' post.author.username %}">@{{ post.author.username }}</a>
+              <span class="time">{{ post.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+          </div>
 
-{% for post in posts %}
-  {# This pulls in the post UI; needs reply_form in the context #}
-  {% include "social/_post_item.html" with post=post reply_form=reply_form %}
-{% empty %}
-  <p>No posts yet.</p>
-{% endfor %}
+          <div class="post-body markdown-output">
+            {% if post.rendered_html %}
+              {{ post.rendered_html|safe }}
+            {% else %}
+              <div data-post-body>{{ post.body }}</div>
+            {% endif %}
+          </div>
+
+          {% if post.image %}
+            <img class="post-image" src="{{ post.image.url }}" alt="post image" loading="lazy">
+          {% endif %}
+
+          <div class="actions row gap-8">
+            <form action="{% url 'social:post-react' post.id 'like' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}#post-{{ post.id }}">
+              <button type="submit" class="btn-ghost">👍 {{ post.likes_count }}</button>
+            </form>
+
+            <form action="{% url 'social:post-react' post.id 'dislike' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}#post-{{ post.id }}">
+              <button type="submit" class="btn-ghost">👎 {{ post.dislikes_count }}</button>
+            </form>
+
+            <form action="{% url 'social:post-share' post.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}#post-{{ post.id }}">
+              <button type="submit" class="btn-ghost">🔁 {{ post.shares_count }}</button>
+            </form>
+
+            {% if user.is_authenticated and user == post.author %}
+              <a class="btn-ghost" href="{% url 'social:post-edit' post.id %}">Edit</a>
+              <form action="{% url 'social:post-delete' post.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-ghost"
+                        onclick="return confirm('Delete this post?');">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+
+          <details class="replies">
+            <summary>Replies ({{ post.reply_count|default:post.replies.count }})</summary>
+            <ul class="reply-list">
+              {% with rl=post.reply_list|default:post.replies.all %}
+                {% for r in rl %}
+                  <li class="reply-item">
+                    <strong>@{{ r.author.username }}</strong>
+                    <span class="reply-time">{{ r.created_at|date:"M d H:i" }}</span>
+                    <div class="reply-body">{{ r.body }}</div>
+                  </li>
+                {% empty %}
+                  <li class="muted">No replies yet.</li>
+                {% endfor %}
+              {% endwith %}
+            </ul>
+
+            {% if user.is_authenticated %}
+              <form action="{% url 'social:post-reply' post.id %}" method="post" class="stack gap-8">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}#post-{{ post.id }}">
+                <textarea name="body" rows="3" placeholder="Write a reply…" required></textarea>
+                <div class="row end">
+                  <button class="btn" type="submit">Reply</button>
+                </div>
+              </form>
+            {% endif %}
+          </details>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p class="muted">No posts yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}
+
+{# ============ RIGHT RAIL ============ #}
+{% block right_rail %}
+  <section class="card">
+    <h3>About @{{ profile_user.username }}</h3>
+    <ul class="muted bullet-list">
+      <li>Joined: {{ profile_user.date_joined|date:"M d, Y" }}</li>
+      {% if profile_user.last_login %}
+      <li>Last seen: {{ profile_user.last_login|date:"M d, Y H:i" }}</li>
+      {% endif %}
+    </ul>
+  </section>
 {% endblock %}

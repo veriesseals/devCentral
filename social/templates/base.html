@@ -8,26 +8,24 @@
   <title>Tru devCentral</title>
 
   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-
-  <!-- Prism theme (one line only) -->
+  <!-- Prism (theme only; core loaded at bottom) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
-
 <body>
+  <!-- Header -->
   <header class="dc-header">
-    <div class="wrap">
+    <div class="wrap head-wrap">
       <div class="brand">
         <img src="{% static 'img/dev_central_logo.png' %}" class="logo" alt="DevCentral" />
         <h1>Tru devCentral</h1>
       </div>
 
-      <nav>
+      <nav class="main-nav">
         {% if user.is_authenticated %}
-          <a class="nav-pill" href="{% url 'social:feed' %}">HOME FEED</a>
+          <a class="nav-pill" href="{% url 'social:feed' %}">Home</a>
           <a class="nav-pill" href="{% url 'social:explore' %}">Explore</a>
           <a class="nav-pill" href="{% url 'social:users' %}">Users</a>
           <a class="nav-pill" href="{% url 'social:profile' user.username %}">@{{ user.username }}</a>
-
           <form action="{% url 'logout' %}" method="post" class="inline-logout">
             {% csrf_token %}
             <button type="submit" class="nav-pill btn-logout">Logout</button>
@@ -37,15 +35,52 @@
           <a class="nav-pill" href="{% url 'social:signup' %}">Sign up</a>
         {% endif %}
       </nav>
-
     </div>
   </header>
 
-  <main class="wrap">
-    {% block content %}{% endblock %}
-  </main>
+  {# ========= Main: app shell for signed-in users; auth shell for login/signup ========= #}
+  {% if user.is_authenticated %}
+    <main class="app">
+      <!-- Left rail (kept empty; CSS collapses on tablet/mobile) -->
+      <aside class="rail rail-left">
+        {% block left_rail %}{% endblock %}
+      </aside>
 
-  <!-- Password Visibility Toggle -->
+      <!-- Center column -->
+      <section class="center">
+        {% block content %}{% endblock %}
+      </section>
+
+      <!-- Right rail: vertical menu box -->
+      <aside class="rail rail-right">
+        {% block right_rail %}
+          {# Robust “active” state: try url_name, fall back to path prefix checks #}
+          {% with nm=request.resolver_match.url_name|default_if_none:'' p=request.path %}
+          <nav class="card menu">
+            <a class="menu-link{% if nm == 'feed' or p == '/' %} active{% endif %}"
+               href="{% url 'social:feed' %}">Feed</a>
+
+            <a class="menu-link{% if nm == 'posts_explore' or p|slice:':9' == '/explore/' or p == '/explore/' %} active{% endif %}"
+               href="{% url 'social:explore' %}">Explore</a>
+
+            <a class="menu-link{% if nm == 'users_list' or p|slice:':7' == '/users/' or p == '/users/' %} active{% endif %}"
+               href="{% url 'social:users' %}">Users</a>
+
+            <a class="menu-link{% if nm == 'profile' or p|slice:':3' == '/u/' %} active{% endif %}"
+               href="{% url 'social:profile' user.username %}">My Profile</a>
+          </nav>
+          {% endwith %}
+        {% endblock %}
+      </aside>
+    </main>
+  {% else %}
+    <main class="wrap auth-shell">
+      {# Use this block on login/signup pages #}
+      {% block auth_content %}{% endblock %}
+    </main>
+  {% endif %}
+
+  <!-- Password visibility toggle -->
   <script>
     function addPasswordToggles() {
       const pwInputs = document.querySelectorAll('input[type="password"]');
@@ -80,7 +115,7 @@
     document.addEventListener('DOMContentLoaded', addPasswordToggles);
   </script>
 
-  <!-- Convert fenced ```lang blocks into <pre><code class="language-..."> for Prism -->
+  <!-- Convert fenced code blocks for Prism -->
   <script>
     function convertFences(root) {
       const blocks = root.querySelectorAll('[data-post-body]');
@@ -107,7 +142,7 @@
     });
   </script>
 
-  <!-- Prism core + autoloader (loads languages on demand) -->
+  <!-- Prism core + autoloader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
   <script>
