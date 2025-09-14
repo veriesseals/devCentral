@@ -32,7 +32,9 @@ def signup_view(request):
                 p.avatar = form.cleaned_data['avatar']
             p.save()
             login(request, user)
-            return redirect('social:feed')  # namespaced URL name
+            return redirect('social:feed')
+        else:
+            messages.error(request, f"Sign up failed. Please fix the errors below.")
     else:
         form = SignUpForm()
     return render(request, 'auth/signup.html', {'form': form})

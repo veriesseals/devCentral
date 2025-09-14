@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+  <h2>Delete your account</h2>
+  <p class="muted">
+    This action is <strong>permanent</strong>. Your profile, posts, and all associated data will be removed and cannot be recovered.
+  </p>
+
+  {# Show any form-wide errors #}
+  {% if form.non_field_errors %}
+    <div class="form-errors">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'social:account_delete' %}">
+    {% csrf_token %}
+
+    {# If your form has a password/confirm checkbox/etc., render fields #}
+    {% for field in form %}
+      <div class="form-field">
+        {{ field.label_tag }}
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <div class="password-help">{{ field.help_text|safe }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="form-field form-actions">
+      <button type="submit" class="btn btn-danger">Yes, delete my account</button>
+      <a href="{% url 'social:profile' user.username %}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block right_rail %}
+    {# keep the standard menu on the right #}
+    {{ block.super }}
+{% endblock %}

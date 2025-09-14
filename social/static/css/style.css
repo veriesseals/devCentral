@@ -1,5 +1,5 @@
 /* =========================
-   Theme tokens
+  Theme tokens
    ========================= */
 :root{
   /* Brand */
@@ -205,24 +205,40 @@ main {
 }
 
 /* =========================
-   Buttons
+  Buttons
    ========================= */
-.btn{
-  background:var(--brand); color:#fff; border:none; border-radius:12px;
+.btn {
+  background:var(--brand);
+  color:#fff;
+  border:none;
+  border-radius:12px;
   padding:10px 14px; cursor:pointer; font-weight:600;
   display:inline-flex; align-items:center; justify-content:center;
   transition:background .2s ease, transform .12s ease, box-shadow .2s ease;
 }
-.btn:hover{ background:var(--brand-600); transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.12); }
-.btn:active{ transform:translateY(0); box-shadow:0 2px 4px rgba(0,0,0,.16); }
+.btn:hover { 
+  background:var(--brand-600);
+  transform:translateY(-2px);
+  box-shadow:0 4px 8px rgba(0,0,0,.12); 
+}
 
-.btn-small{ height:32px; padding:0 12px; font-size:.875rem; }
-.btn-ghost{ background:var(--pill); color:var(--brand-700); }
+.btn:active { transform:translateY(0);
+  box-shadow:0 2px 4px rgba(0,0,0,.16);
+}
+
+.btn-small { height:32px; padding:0 12px; font-size:.875rem; }
+.btn-ghost { background:var(--pill); color:var(--brand-700); }
 .btn-ghost:hover{ background:var(--pill-200); }
-.btn-danger{ background:#e11d48; color:#fff; }
+.btn-danger { background:#e11d48; color:#fff; }
 .btn-danger:hover{ background:#be123c; }
 
-.btn-follow{ background:var(--brand); color:#fff; padding:6px 14px; border-radius:999px; }
+.btn-follow {
+  background:var(--brand);
+  color:#fff;
+  padding:6px 14px;
+  border-radius:999px;
+}
+
 .btn-follow:hover{ background:var(--brand-600); }
 .btn-unfollow{ background:#e11d48; color:#fff; padding:6px 14px; border-radius:999px; }
 .btn-unfollow:hover{ background:#be123c; }
@@ -235,66 +251,185 @@ main {
 .inline-form button{ background:none; border:none; color:var(--brand-600); cursor:pointer; font:inherit; padding:0; }
 
 /* =========================
-   Forms
+  Forms
    ========================= */
 input[type="text"], input[type="email"], input[type="password"],
-textarea, select{
-  width:100%; padding:10px 12px; border:1px solid var(--line);
-  border-radius:12px; background:#fff; color:var(--text);
+textarea, select {
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  color:var(--text);
 }
-textarea{ resize:vertical; }
+
+textarea { 
+  resize:vertical; 
+}
 
 /* Password visibility toggle */
-.pw-field{ position:relative; display:inline-block; width:auto; }
-.pw-field input[type="password"], .pw-field input[type="text"]{ width:220px; padding-right:3rem; box-sizing:border-box; }
-.pw-toggle{
-  position:absolute; right:10px; top:50%; transform:translateY(-50%);
-  background:none; border:0; cursor:pointer; font:inherit; color:var(--brand-700);
+.pw-field {
+  position:relative;
+  display:inline-block;
+  width:auto; 
+}
+
+.pw-field input[type="password"], .pw-field input[type="text"] {
+  width:220px;
+  padding-right:3rem;
+  box-sizing:border-box;
+}
+
+.pw-toggle {
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:0;
+  cursor:pointer;
+  font:inherit;
+  color:var(--brand-700);
   padding:4px 6px; border-radius:8px;
 }
-.pw-toggle:hover, .pw-toggle:focus{ outline:none; background:#e8ffff; }
-.pw-toggle .eye{ display:inline-block; font-weight:700; }
+
+.pw-toggle:hover, .pw-toggle:focus {
+  outline:none;
+  background:#e8ffff;
+}
+
+.pw-toggle .eye {
+  display:inline-block;
+  font-weight:700; 
+}
 
 /* =========================
-   Feed / posts
+  Feed / posts
    ========================= */
-.compose-card, .post-card{
-  background:var(--card); border:1px solid var(--line);
-  border-radius:16px; padding:12px; margin:14px 0;
+.compose-card, .post-card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  margin:14px 0;
 }
-.compose-card .row{ display:flex; gap:12px; align-items:center; margin-top:8px; }
 
-.post-card{ display:flex; gap:14px; }
-.avatar{ width:48px; height:48px; border-radius:999px; overflow:hidden; flex:0 0 auto; border:2px solid var(--brand); }
-.avatar img{ width:100%; height:100%; object-fit:cover; }
-.avatar.lg{ width:120px; height:120px; border:4px solid var(--brand); }
+.compose-card .row {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:8px;
+}
 
-.content{ flex:1; }
-.meta{ display:flex; gap:12px; align-items:center; font-size:14px; color:var(--muted); }
-.username{ color:var(--brand-700); font-weight:700; text-decoration:none; }
-.post-body{ white-space:normal; }
-.post-image{ margin-top:8px; max-width:100%; border-radius:12px; }
+.post-card {
+  display:flex;
+  gap:14px;
+}
 
-.actions a{ margin-right:14px; text-decoration:none; color:var(--brand-700); font-weight:600; }
-.replies summary{ cursor:pointer; color:var(--brand-700); margin-top:6px; font-weight:600; }
+.avatar {
+  width:48px;
+  height:48px;
+  border-radius:999px;
+  overflow:hidden;
+  flex:0 0 auto;
+  border:2px solid var(--brand);
+}
+
+.avatar img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.avatar.lg {
+  width:120px;
+  height:120px;
+  border:4px solid var(--brand);
+}
+
+.content {
+  flex:1;
+}
+.meta {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  font-size:14px;
+  color:var(--muted);
+}
+.username {
+  color:var(--brand-700);
+  font-weight:700;
+  text-decoration:none;
+}
+
+.post-body {
+  white-space:normal;
+}
+
+.post-image {
+  margin-top:8px;
+  max-width:100%;
+  border-radius:12px;
+}
+
+.actions a {
+  margin-right:14px;
+  text-decoration:none;
+  color:var(--brand-700);
+  font-weight:600;
+}
+.replies summary {
+  cursor:pointer;
+  color:var(--brand-700);
+  margin-top:6px;
+  font-weight:600;
+}
 
 /* Code blocks (Prism/Pygments) */
-.post-card pre, .snippet-card pre{ border-radius:10px; overflow:auto; margin:8px 0; }
-.post-card pre code, .snippet-card pre code{
+.post-card pre, .snippet-card pre { 
+  border-radius:10px;
+  overflow:auto;
+  margin:8px 0;
+}
+
+.post-card pre code, .snippet-card pre code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size:.95rem; line-height:1.4;
 }
+
 /* Minimal Pygments fallback */
-.codehilite{ background:#0f172a; color:#e5e7eb; padding:10px; border-radius:10px; overflow:auto; }
-.codehilite .k{ color:#93c5fd; }   /* keywords */
-.codehilite .s{ color:#fca5a5; }   /* strings  */
-.codehilite .c{ color:#9ca3af; }   /* comments */
+.codehilite {
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:10px;
+  border-radius:10px;
+  overflow:auto;
+}
+
+.codehilite .k {
+  color:#93c5fd;
+}   /* keywords */
+
+.codehilite .s {
+  color:#fca5a5;
+}   /* strings  */
+
+.codehilite .c {
+  color:#9ca3af;
+}   /* comments */
 
 /* =========================
-   Flash messages
+  Flash messages
    ========================= */
-.flash{ position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px; z-index:50; }
-.flash-item{ background:#fff; border:1px solid var(--line); box-shadow:var(--shadow); padding:10px 12px; border-radius:12px; }
+.flash {
+  position:fixed;
+  right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px; z-index:50;
+}
+.flash-item {
+  background:#fff; border:1px solid var(--line); box-shadow:var(--shadow); padding:10px 12px; border-radius:12px;
+
+  }
 
 /* Ensure logout button matches nav-pill links */
 .inline-logout button.nav-pill {
@@ -327,10 +462,8 @@ textarea{ resize:vertical; }
   box-shadow: 0 2px 4px rgba(0,0,0,.18);
 }
 
-
-
 /* =========================
-   Footer
+  Footer
    ========================= */
 .dc-footer{
   border-top:1px solid var(--line);
@@ -344,6 +477,17 @@ textarea{ resize:vertical; }
   display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap;
 }
 
+.password-help {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+  padding: 6px 8px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+
 /* =========================
    Auth pages (login/signup)
    ========================= */
@@ -353,14 +497,92 @@ textarea{ resize:vertical; }
   background:var(--card); border:1px solid var(--line); border-radius:16px; padding:32px 28px; box-shadow:var(--shadow);
 }
 
+/* Signup / login form fields */
+.auth-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;              /* equal spacing between all fields */
+  text-align: left;       /* keep inputs aligned left, headings center */
+}
+
+.auth-page form label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.auth-page form input,
+.auth-page form textarea,
+.auth-page form select {
+  margin-top: 4px;
+}
+
+.auth-page .errorlist {
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  background: #fee2e2;      /* light red background */
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+.auth-page .password-help {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 6px 8px;
+  line-height: 1.4;
+}
+
+/* Consistent spacing for all form fields */
+.form-field {
+  text-align: left;
+  margin-bottom: 18px;   /* ✅ same gap for every field */
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* Password help box */
+.password-help {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 10px;   /* ✅ space under help text */
+  padding: 6px 10px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+/* Password inputs inline with Show/Hide button */
+.password-field input {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.form-actions {
+  display:flex;
+   gap:10px;
+}
+
+
 
 /* =========================
-   Utilities
+  Utilities
    ========================= */
-.muted{ color:var(--muted); }
+.muted {
+  color:var(--muted);
+}
 
 /* =========================
-   Responsive
+  Responsive
    ========================= */
 @media (max-width:1200px){
   :root{ --rail-right:300px; }
