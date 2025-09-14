@@ -29,10 +29,10 @@ def post_upload_path(instance, filename):
 # Profile model
 # -----------------------------------------------
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     avatar = models.ImageField(upload_to=avatar_upload_path, blank=True, null=True)
     bio = models.CharField(max_length=280, blank=True)
-    followers = models.ManyToManyField('auth.User', related_name='following', blank=True)
+    followers = models.ManyToManyField(User, related_name="following", blank = True)
     
     def __str__(self): return self.user.username
 

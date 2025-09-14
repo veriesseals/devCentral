@@ -35,27 +35,26 @@
           <p class="profile-bio">{{ profile_user.profile.bio }}</p>
         {% endif %}
 
+        {# Prefer counts from the view; fall back to something sane if absent #}
         <p class="follow-stats">
-          <strong>{{ profile_user.profile.followers.count }}</strong> Followers
+          <strong>{{ follower_count|default:profile_user.profile.followers.count }}</strong> Followers
           &nbsp;·&nbsp;
-          <strong>
-            {% if profile_user.profile.following %}
-              {{ profile_user.profile.following.count }}
-            {% else %}0{% endif %}
-          </strong> Following
+          <strong>{{ following_count|default:0 }}</strong> Following
         </p>
 
         <div class="row gap-8">
           {% if user.is_authenticated and user != profile_user %}
-            {% if user in profile_user.profile.followers.all %}
-              <form action="{% url 'social:unfollow' profile_user.username %}" method="post">
+            {% if is_following %}
+              <form action="{% url 'social:unfollow' profile_user.username %}" method="post" class="inline-form">
                 {% csrf_token %}
-                <button type="submit" class="btn">Unfollow</button>
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn btn-unfollow">Unfollow</button>
               </form>
             {% else %}
-              <form action="{% url 'social:follow' profile_user.username %}" method="post">
+              <form action="{% url 'social:follow' profile_user.username %}" method="post" class="inline-form">
                 {% csrf_token %}
-                <button type="submit" class="btn">Follow</button>
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn btn-follow">Follow</button>
               </form>
             {% endif %}
           {% endif %}
@@ -63,6 +62,44 @@
       </div>
     </div>
   </section>
+
+  {# Optional: show follower/following lists if the view supplies them #}
+  {% if followers or following %}
+    <section class="card">
+      <div class="row gap-20" style="flex-wrap:wrap;">
+        {% if followers %}
+          <div style="min-width:240px;flex:1 1 280px;">
+            <h3 class="muted">Followers ({{ follower_count }})</h3>
+            <ul class="follow-list">
+              {% for u in followers %}
+                <li><a href="{% url 'social:profile' u.username %}">@{{ u.username }}</a></li>
+              {% empty %}
+                <li class="muted">No followers yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if following %}
+          <div style="min-width:240px;flex:1 1 280px;">
+            <h3 class="muted">Following ({{ following_count }})</h3>
+            <ul class="follow-list">
+              {# if following are Profile objects, use p.user; if they’re Users, just use them #}
+              {% for p in following %}
+                {% if p.user %}
+                  <li><a href="{% url 'social:profile' p.user.username %}">@{{ p.user.username }}</a></li>
+                {% else %}
+                  <li><a href="{% url 'social:profile' p.username %}">@{{ p.username }}</a></li>
+                {% endif %}
+              {% empty %}
+                <li class="muted">Not following anyone yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
 
   {% if user.is_authenticated and user == profile_user %}
     <section class="card">
@@ -141,8 +178,7 @@
               <a class="btn-ghost" href="{% url 'social:post-edit' post.id %}">Edit</a>
               <form action="{% url 'social:post-delete' post.id %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn-ghost"
-                        onclick="return confirm('Delete this post?');">Delete</button>
+                <button type="submit" class="btn-ghost" onclick="return confirm('Delete this post?');">Delete</button>
               </form>
             {% endif %}
           </div>
@@ -189,7 +225,7 @@
     <ul class="muted bullet-list">
       <li>Joined: {{ profile_user.date_joined|date:"M d, Y" }}</li>
       {% if profile_user.last_login %}
-      <li>Last seen: {{ profile_user.last_login|date:"M d, Y H:i" }}</li>
+        <li>Last seen: {{ profile_user.last_login|date:"M d, Y H:i" }}</li>
       {% endif %}
     </ul>
   </section>

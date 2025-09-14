@@ -16,6 +16,7 @@ from .models import Post, Reply, CodeSnippet, Follow
 from django.urls import reverse  # <-- ensure this import exists
 from django.db.models import Prefetch
 
+
 User = get_user_model()
 
 # -----------------------
@@ -46,17 +47,17 @@ def signup_view(request):
 def feed_view(request):
     following_ids = request.user.following.values_list('id', flat=True)
     posts = (Post.objects
-             .select_related('author', 'author__profile')
-             .filter(Q(author=request.user) | Q(author__id__in=following_ids))
-             .order_by('-created_at'))
+            .select_related('author', 'author__profile')
+            .filter(Q(author=request.user) | Q(author__id__in=following_ids))
+            .order_by('-created_at'))
 
     for p in posts:
         p.rendered_html = render_markdown(p.body)
 
     all_users = (User.objects
-                 .select_related('profile')
-                 .exclude(id=request.user.id)
-                 .order_by('username'))
+                .select_related('profile')
+                .exclude(id=request.user.id)
+                .order_by('username'))
 
     # collect replies for these posts (works regardless of related_name)
     post_ids = [p.id for p in posts]
@@ -212,56 +213,102 @@ def snippet_delete(request, pk):
 @login_required
 def follow(request, username):
     target = get_object_or_404(User, username=username)
-    if target != request.user:
-        Follow.objects.get_or_create(follower=request.user, following=target)
+
+    if request.user == target:
+        messages.info(request, "You can't follow yourself.")
+    else:
+        # Idempotent: M2M add won't duplicate
+        target.profile.followers.add(request.user)
         messages.success(request, f"You’re now following @{target.username}.")
-    return redirect('social:profile', username=target.username)
+
+    next_url = (request.POST.get("next")
+                or request.META.get("HTTP_REFERER")
+                or reverse("social:profile", args=[username]))
+    return redirect(next_url)
 
 @require_POST
 @login_required
 def unfollow(request, username):
     target = get_object_or_404(User, username=username)
-    if target != request.user:
-        Follow.objects.filter(follower=request.user, following=target).delete()
-        messages.success(request, f"You unfollowed @{target.username}.")
-    return redirect('social:profile', username=target.username)
+
+    if request.user == target:
+        messages.info(request, "You can't unfollow yourself.")
+    else:
+        target.profile.followers.remove(request.user)
+        messages.info(request, f"You unfollowed @{target.username}.")
+
+    next_url = (request.POST.get("next")
+                or request.META.get("HTTP_REFERER")
+                or reverse("social:profile", args=[username]))
+    return redirect(next_url)
 
 # -----------------------
 # Profiles
 # -----------------------
+
 @login_required
-def profile_view(request, username):
-    u = get_object_or_404(User, username=username)
-    is_following = request.user in u.profile.followers.all()
-    posts = u.posts.order_by('-created_at')
-    form = ProfileForm(instance=request.user.profile) if request.user == u else None
+@login_required
+def profile(request, username):
+    profile_user = get_object_or_404(User.objects.select_related("profile"), username=username)
+
+    # Followers: Users who follow this profile_user
+    followers = profile_user.profile.followers.select_related("profile").order_by("username")
+    follower_count = followers.count()
+
+    # Following: Profiles that THIS user follows (Profile queryset)
+    following_profiles = profile_user.following.select_related("user", "user__profile").order_by("user__username")
+    following_count = following_profiles.count()
+
+    # Is the current viewer following this profile?
+    is_following = False
+    if request.user.is_authenticated and request.user != profile_user:
+        is_following = profile_user.profile.followers.filter(pk=request.user.pk).exists()
+
+    # User's posts
+    posts = (Post.objects
+             .filter(author=profile_user)
+             .select_related('author', 'author__profile')
+             .order_by('-created_at'))
+
+    for p in posts:
+        try:
+            p.rendered_html = render_markdown(p.body)
+        except Exception:
+            p.rendered_html = None
+
+    # Attach replies (optional but keeps consistent with feed/explore)
+    post_ids = [p.id for p in posts]
+    reply_map = defaultdict(list)
+    for r in (Reply.objects
+              .filter(post_id__in=post_ids)
+              .select_related('author', 'author__profile')
+              .order_by('created_at')):
+        reply_map[r.post_id].append(r)
+    for p in posts:
+        p.reply_list = reply_map.get(p.id, [])
+        p.reply_count = len(p.reply_list)
+
+    # Edit form only for the owner
+    form = ProfileForm(instance=request.user.profile) if request.user == profile_user else None
     if request.method == 'POST' and form:
         form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('social:profile', username=u.username)
-    return render(request, 'profile.html', {
-        'profile_user': u,
-        'is_following': is_following,
-        'posts': posts,
-        'form': form
+            messages.success(request, "Profile updated.")
+            return redirect('social:profile', username=profile_user.username)
+
+    return render(request, "profile.html", {
+        "profile_user": profile_user,
+        "followers": followers,
+        "follower_count": follower_count,
+        "following": following_profiles,
+        "following_count": following_count,
+        "is_following": is_following,
+        "posts": posts,
+        "reply_form": ReplyForm(),
+        "form": form,
     })
-@login_required
-def profile(request, username):
-    profile_user = get_object_or_404(User, username=username)
-    is_self = (request.user.is_authenticated and request.user.pk == profile_user.pk)
-    is_following = False
-    if request.user.is_authenticated and not is_self:
-        is_following = Follow.objects.filter(follower=request.user, following=profile_user).exists()
-    follower_count = Follow.objects.filter(following=profile_user).count()
-    following_count = Follow.objects.filter(follower=profile_user).count()
-    return render(request, 'profile.html', {
-        'profile_user': profile_user,
-        'is_self': is_self,
-        'is_following': is_following,
-        'follower_count': follower_count,
-        'following_count': following_count,
-    })
+
 
 # -----------------------
 # Account delete

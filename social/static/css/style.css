@@ -232,12 +232,17 @@ main {
 .btn-danger { background:#e11d48; color:#fff; }
 .btn-danger:hover{ background:#be123c; }
 
+/* Follow button */
 .btn-follow {
   background:var(--brand);
   color:#fff;
   padding:6px 14px;
   border-radius:999px;
 }
+
+.follow-list { list-style: none; padding: 0; margin: .25rem 0 1rem; }
+.follow-list li { margin: 4px 0; }
+
 
 .btn-follow:hover{ background:var(--brand-600); }
 .btn-unfollow{ background:#e11d48; color:#fff; padding:6px 14px; border-radius:999px; }
@@ -267,17 +272,18 @@ textarea {
   resize:vertical; 
 }
 
-/* Password visibility toggle */
+/* Password visibility toggle - full width */
 .pw-field {
-  position:relative;
-  display:inline-block;
-  width:auto; 
+  position: relative;
+  display: block;     /* full width container */
+  width: 100%;
 }
 
-.pw-field input[type="password"], .pw-field input[type="text"] {
-  width:220px;
-  padding-right:3rem;
-  box-sizing:border-box;
+.pw-field input[type="password"],
+.pw-field input[type="text"] {
+  width: 100%;        /* match username field */
+  padding-right: 3rem; /* space for the Show/Hide button */
+  box-sizing: border-box;
 }
 
 .pw-toggle {
